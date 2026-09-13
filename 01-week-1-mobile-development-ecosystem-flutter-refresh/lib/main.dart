@@ -1,48 +1,65 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const ProfileApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ProfileApp extends StatelessWidget {
+  const ProfileApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Profil Mahasiswa',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+      home: Scaffold(
+        body: Center(child: ProfileCard()),
       ),
-      home: const MyHomePage(title: 'Profil Mahasiswa'),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class ProfileCard extends StatelessWidget {
+  const ProfileCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Profil Mahasiswa')),
-        body: const Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.school, size: 72),
-            SizedBox(height: 16),
-            Text('Indhira Yuantika Christy', style: TextStyle(fontSize: 24)),
-            Text('Kelas : 3E', style: TextStyle(fontSize: 16 )),
-            Text('NIM : 244107020171', style: TextStyle(fontSize: 16 )),
-            Text('\nPemrograman Mobile — Minggu 1'),
+    return Container(
+      width: 320,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.indigo.shade50,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(child: Icon(Icons.person)),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('Nama Mahasiswa',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Indhira Yuantika Christy Victoria Ozora'),
+                ],
+              ),
             ],
           ),
-        ),
-      )
+          const SizedBox(height: 12),
+          const Row(children: [
+            Expanded(child: Text('NIM')),
+            Text('244107020171'),
+          ]),
+          const Row(children: [
+            Expanded(child: Text('Kelas')),
+            Text('TI-3E'),
+          ]),
+          const Row(
+            children: [
+              Expanded(child: Text('Email')),
+              Text('indhirayuantikac@gmail.com'),
+            ],)
+        ],
+      ),
     );
   }
 }
