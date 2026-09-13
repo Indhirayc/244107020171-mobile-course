@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const double kWideBreakpoint = 700;
+
 void main() => runApp(const AcademicApp());
 
 class AcademicApp extends StatefulWidget {
@@ -55,6 +57,9 @@ class AcademicOverviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Academic Overview'),
@@ -71,11 +76,14 @@ class AcademicOverviewPage extends StatelessWidget {
                       ? Icons.dark_mode
                       : Icons.light_mode,
                 ),
+
                 const SizedBox(width: 4),
+
                 Switch.adaptive(
                   value: isDark,
                   onChanged: onDarkChanged,
                 ),
+
                 const SizedBox(width: 12),
               ],
             ),
@@ -86,28 +94,31 @@ class AcademicOverviewPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final columns =
-              constraints.maxWidth >= 700 ? 2 : 1;
+              constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Profil
+                // =========================
+                // HEADER PROFIL
+                // =========================
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
+
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primaryContainer,
+                    color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
                   ),
+
                   child: Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 32,
-                        child: const Icon(
+                        child: Icon(
                           Icons.person,
                           size: 36,
                         ),
@@ -124,21 +135,23 @@ class AcademicOverviewPage extends StatelessWidget {
                               label: 'Nama mahasiswa',
                               child: Text(
                                 'Indhira Yuantika Christy',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
+                                style: theme.textTheme.titleLarge
                                     ?.copyWith(
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
+
                             const SizedBox(height: 4),
-                            const Text(
+
+                            Text(
                               'D4 Teknik Informatika',
+                              style: theme.textTheme.bodyMedium,
                             ),
-                            const Text(
-                              'Semester 4 • Kelas 2A',
+
+                            Text(
+                              'Semester 5 • Kelas 3E',
+                              style: theme.textTheme.bodyMedium,
                             ),
                           ],
                         ),
@@ -149,44 +162,53 @@ class AcademicOverviewPage extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
+                // =========================
+                // ACADEMIC SUMMARY
+                // =========================
                 Text(
                   'Academic Summary',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
                 const SizedBox(height: 12),
 
-                // Kartu Informasi
+                // =========================
+                // INFO CARDS
+                // =========================
                 GridView.count(
                   shrinkWrap: true,
                   physics:
                       const NeverScrollableScrollPhysics(),
+
                   crossAxisCount: columns,
+
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
+
                   childAspectRatio: 2.4,
+
                   children: const [
-                    AcademicCard(
+                    InfoCard(
                       icon: Icons.school,
                       title: 'IPK',
                       value: '3.75',
                     ),
-                    AcademicCard(
+
+                    InfoCard(
                       icon: Icons.assignment,
                       title: 'Assignments',
                       value: '8',
                     ),
-                    AcademicCard(
+
+                    InfoCard(
                       icon: Icons.event_available,
                       title: 'Attendance',
                       value: '92%',
                     ),
-                    AcademicCard(
+
+                    InfoCard(
                       icon: Icons.menu_book,
                       title: 'Courses',
                       value: '8',
@@ -196,40 +218,49 @@ class AcademicOverviewPage extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Current Semester
+                // =========================
+                // CURRENT SEMESTER
+                // =========================
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
+
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
+
                     border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .outline,
+                      color: colorScheme.outline,
                     ),
                   ),
+
                   child: Column(
                     crossAxisAlignment:
                         CrossAxisAlignment.start,
+
                     children: [
                       Text(
                         'Current Semester',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
+                        style: theme.textTheme.titleMedium
                             ?.copyWith(
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+
                       const SizedBox(height: 12),
-                      const Row(
+
+                      Row(
                         children: [
-                          Icon(Icons.calendar_month),
-                          SizedBox(width: 8),
+                          Icon(
+                            Icons.calendar_month,
+                            color: colorScheme.primary,
+                          ),
+
+                          const SizedBox(width: 8),
+
                           Expanded(
                             child: Text(
-                              'Semester 4 - Academic Year 2026',
+                              'Semester 5 - Academic Year 2026',
+                              style: theme.textTheme.bodyMedium,
                             ),
                           ),
                         ],
@@ -246,8 +277,12 @@ class AcademicOverviewPage extends StatelessWidget {
   }
 }
 
-class AcademicCard extends StatelessWidget {
-  const AcademicCard({
+// ==================================================
+// REUSABLE INFO CARD
+// ==================================================
+
+class InfoCard extends StatelessWidget {
+  const InfoCard({
     required this.icon,
     required this.title,
     required this.value,
@@ -260,24 +295,26 @@ class AcademicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Semantics(
       label: '$title: $value',
+
       child: Container(
         padding: const EdgeInsets.all(20),
+
         decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerHighest,
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
+
         child: Row(
           children: [
             Icon(
               icon,
               size: 32,
-              color: Theme.of(context)
-                  .colorScheme
-                  .primary,
+              color: colorScheme.primary,
             ),
 
             const SizedBox(width: 16),
@@ -286,19 +323,24 @@ class AcademicCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
+
                 mainAxisAlignment:
                     MainAxisAlignment.center,
+
                 children: [
-                  Text(title),
+                  Text(
+                    title,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+
                   const SizedBox(height: 4),
+
                   Text(
                     value,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
+                    style: theme.textTheme.headlineSmall
                         ?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),

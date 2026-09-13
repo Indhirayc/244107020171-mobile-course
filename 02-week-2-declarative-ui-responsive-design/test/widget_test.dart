@@ -1,30 +1,38 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:mobile_week_2/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const DashboardApp());
+  testWidgets('Academic Overview satu kolom di layar sempit', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(const AcademicApp());
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    final cards = find.byType(InfoCard);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(cards, findsNWidgets(4));
+
+    final firstCard = tester.getTopLeft(cards.at(0));
+    final secondCard = tester.getTopLeft(cards.at(1));
+
+    expect(secondCard.dy, greaterThan(firstCard.dy));
+  });
+
+  testWidgets('Academic Overview dua kolom di layar lebar', (tester) async {
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const AcademicApp());
+
+    final cards = find.byType(InfoCard);
+
+    expect(cards, findsNWidgets(4));
+
+    final firstCard = tester.getTopLeft(cards.at(0));
+    final secondCard = tester.getTopLeft(cards.at(1));
+
+    expect(secondCard.dx, greaterThan(firstCard.dx));
   });
 }
