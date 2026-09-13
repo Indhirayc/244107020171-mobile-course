@@ -42,19 +42,19 @@
 
 ## Layout Sederhana (Warm-up)
 
-### 1. Menghapus Expanded pada baris nama, kemudian mengamati peringatan overflow, dan mengembalikannya setelah itu.
+1. Menghapus Expanded pada baris nama, kemudian mengamati peringatan overflow, dan mengembalikannya setelah itu.
 
     Bukti screenshot:
 
     ![Hapus Expanded](screenshots/4_hapus_expanded.png)
 
-### 2. Mengganti mainAxisSize: MainAxisSize.min menjadi nilai default (max) dan mengamati perubahan tinggi kartu.
+2. Mengganti mainAxisSize: MainAxisSize.min menjadi nilai default (max) dan mengamati perubahan tinggi kartu.
 
     Bukti screenshot:
 
     ![Mengganti mainAxisSize](screenshots/4_mainAxisSize.png)
 
-### 3. Menambahkan satu baris data email baru.
+3. Menambahkan satu baris data email baru.
 
     Bukti screenshot:
 
@@ -64,13 +64,13 @@
 
 ## Dashboard Responsif
 
-### 1. Menyiapkan project, run, memodifikasi kode program untuk widget statis (stateless widget).
+1. Menyiapkan project, run, memodifikasi kode program untuk widget statis (stateless widget).
 
     Bukti screenshot:
 
     ![Preparation](screenshots/5_preparation.png)
 
-### 2. Menambahkan interaksi StatefulWidget dan Cupertino Switch.
+2. Menambahkan interaksi StatefulWidget dan Cupertino Switch.
 
     Terlihat pada tampilan aplikasi terdapat switch untuk mengatur tema. Ketika switch diaktifkan, tampilan berubah menjadi dark mode dan icon berubah menjadi dark_mode. Ketika switch dimatikan, tampilan kembali menjadi light mode.
 
@@ -92,7 +92,7 @@
 
 ## Eksperimen Layout
 
-### 1. Ubah breakpoint dari 700 menjadi nilai lain dan amati perubahan jumlah kolom.
+1. Ubah breakpoint dari 700 menjadi nilai lain dan amati perubahan jumlah kolom.
 
     Pada kasus ini, saya mengganti nilai breakpoint yang semula 700 menjadi 400 sesuai dengan kode program berikut:
 
@@ -102,7 +102,7 @@
 
     ![Tampilan Breakpoint Diubah](screenshots/5_breakpointDiubah.png)
 
-### 2. Ubah themeMode menjadi ThemeMode.dark, lalu kembalikan ke ThemeMode.system.
+2. Ubah themeMode menjadi ThemeMode.dark, lalu kembalikan ke ThemeMode.system.
 
     Pada soal ini, kode program diubah agar tampilan aplikasi diubah statis menjadi dark mode saja sesuai kode program berikut:
     
@@ -116,13 +116,13 @@
 
     ![Tema Sesuai Sistem Perangkat](screenshots/5_systemTheme.png)
 
-### 3. Uji aplikasi dengan ukuran layar emulator yang berbeda.
+3. Uji aplikasi dengan ukuran layar emulator yang berbeda.
 
     Berikut merupakan tampilan aplikasi pada perangkat iPhone SE. Terlihat bahwa tampilan pada iPhone SE, kolom yang ditampilkan hanya 1 kolom, dan default dari tema sistem adalah tema gelap.
 
     ![Tampilan iPhone SE](screenshots/5_tampilanAplikasiIPhoneSE.png)
 
-### 4. Tambahkan Semantics atau label yang bermakna pada elemen yang penting bagi screen reader.
+4. Tambahkan Semantics atau label yang bermakna pada elemen yang penting bagi screen reader.
 
     Menambahkan kode program semantics pada toggle mode gelap dan terang sesuai dengan kode program berikut:
 
@@ -156,8 +156,7 @@ Tampilan pada layar lebar (1024x1366):
 ## AI Prompt Challenge
 Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
 
-### 1. Prompt Desain
-
+1. Prompt Desain
     Prompt: Bandingkan dua tata letak dashboard akademik untuk Flutter: versi GridView dengan jumlah kolom tetap dan versi LayoutBuilder + GridView dengan breakpoint. Jelaskan trade-off responsivitas dan aksesibilitasnya.
 
     Jawaban: 
@@ -196,7 +195,7 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
 
     ![Tampilan LayoutBuilder + GridView](screenshots/6_tampilan_promptDesain.png)
 
-### 2. Prompt Penguatan Konsep
+2. Prompt Penguatan Konsep
 
     Prompt: Jelaskan kapan penggunaan Expanded justru menyebabkan overflow di dalam Row, beri contoh kode yang gagal dan perbaikannya.
 
@@ -204,7 +203,7 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
 
         Expanded digunakan untuk membuat widget anak mengisi ruang yang tersedia di dalam Row atau Column. Namun, Expanded dapat menyebabkan layout error ketika parent memberikan ukuran yang tidak terbatas pada arah yang sama. Salah satu contohnya adalah ketika Row berada di dalam SingleChildScrollView dengan arah scroll horizontal.
 
-        Bukti Verifikasi:
+    ### Bukti Verifikasi:
 
         Kode Program & Tampilan saat terjadi overflow pada Expanded:
 
@@ -288,11 +287,11 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
             ),
         ),
 
-    ![Tampilan Solusi Overflow Expanded](screenshots/6_solusi_overflowExpanded.png)
+        ![Tampilan Solusi Overflow Expanded](screenshots/6_solusi_overflowExpanded.png)
 
-    Pada kode final aplikasi, Expanded tetap digunakan pada bagian header karena Row berada di dalam Container yang memiliki lebar terbatas. Dengan kondisi tersebut, Expanded dapat menggunakan sisa ruang yang tersedia secara normal.
+        Pada kode final aplikasi, Expanded tetap digunakan pada bagian header karena Row berada di dalam Container yang memiliki lebar terbatas. Dengan kondisi tersebut, Expanded dapat menggunakan sisa ruang yang tersedia secara normal.
 
-### 3. Verification Prompt
+3. Verification Prompt
 
     Prompt: Periksa kembali rekomendasi layout di atas: apakah tetap responsif di bawah 600px, apakah mengurangi aksesibilitas, dan apakah ada widget yang tidak tersedia di Flutter stabil saat ini?
     Jawaban: 
@@ -316,12 +315,12 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
 
 ## Refactoring Challenge
 
-### 1. Ekstrak kartu informasi menjadi widget reusable (misal InfoCard) yang menerima title dan value, sehingga tidak ada duplikasi widget.
+1. Ekstrak kartu informasi menjadi widget reusable (misal InfoCard) yang menerima title dan value, sehingga tidak ada duplikasi widget.
 
     Memodifikasi kode program dengan membuat InfoCard sebagai widget reusable sehingga kode untuk setiap kartu informasi tidak perlu ditulis berulang kali.
 
     Pada implementasi final, InfoCard menerima icon, title, dan value.
-
+    ### Kode program:
     class InfoCard extends StatelessWidget {
         const InfoCard({
             required this.icon,
@@ -334,17 +333,17 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
         final String value;
     }
 
-### 2. Ganti warna dan styling dengan Theme.of(context)
+2. Ganti warna dan styling dengan Theme.of(context)
 
     Pada implementasi final, warna dan style yang berkaitan dengan tema menggunakan Theme.of(context) agar dapat mengikuti tema terang dan gelap.
 
-    Contoh kode program:
+    ### Contoh kode program:
     color: Theme.of(context).colorScheme.primaryContainer,
     style: Theme.of(context).textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.bold,
         ),
 
-### 3. Pindahkan breakpoint ke satu konstanta
+3. Pindahkan breakpoint ke satu konstanta
 
     Breakpoint dipindahkan ke satu konstanta agar nilai breakpoint hanya didefinisikan satu kali.
     
@@ -353,7 +352,7 @@ Menggunakan AI (Gemini & ChatGPT) untuk membandingkan dua alternatif tata letak.
     final columns =
     constraints.maxWidth >= kWideBreakpoint ? 2 : 1;
 
-### 4. Menjalankan flutter analyze
+4. Menjalankan flutter analyze
 
     Perintah flutter analyze dijalankan untuk memastikan tidak terdapat error maupun warning baru pada kode program.
     Bukti screenshot:
@@ -375,19 +374,19 @@ Hasil flutter test:
 
 ## Checklist Verifikasi
 
-### 1. flutter analyze tidak menghasilkan error.
+1. flutter analyze tidak menghasilkan error.
 
     Screenshot:
 
     ![Tampilan Perintah Flutter Analyze](screenshots/6_flutterAnalyze.png)
 
-### 2. flutter test lulus semua widget test responsif.
+2. flutter test lulus semua widget test responsif.
 
     Screenshot:
 
     ![Hasil Flutter test](screenshots/6_flutterTest (2).png)
 
-### 3. Aplikasi dapat dijalankan pada ukuran layar sempit dan lebar.
+3. Aplikasi dapat dijalankan pada ukuran layar sempit dan lebar.
 
     Screenshot:
     Layar sempit:
@@ -398,30 +397,30 @@ Hasil flutter test:
 
     ![Layar Lebar](screenshots/6_tampilaniPad_1024x1366.png)
 
-### 4. Dark mode memiliki kontras dan teks yang terbaca.
+4. Dark mode memiliki kontras dan teks yang terbaca.
 
     ![Dark Mode Terbaca](screenshots/6_darkMode.png)
 
-### 5. Struktur widget dapat dijelaskan saat code review.
-### 6. Screenshot, folder test/, dan README sudah tersimpan pada folder tugas Week 2.
+5. Struktur widget dapat dijelaskan saat code review.
+6. Screenshot, folder test/, dan README sudah tersimpan pada folder tugas Week 2.
 
 ---
 
 ## Konsep yang Dipelajari
 
-### 1. Declarative UI
+1. Declarative UI
 Declarative UI merupakan pendekatan pembuatan antarmuka dengan mendeskripsikan tampilan yang diinginkan berdasarkan kondisi aplikasi.
 
-### 2. Widget Tree
+2. Widget Tree
 Widget tree merupakan struktur hierarki widget yang digunakan untuk membentuk tampilan aplikasi Flutter.
 
-### 3. Responsive Design
+3. Responsive Design
 Responsive design merupakan pendekatan untuk membuat tampilan aplikasi dapat menyesuaikan ukuran layar yang berbeda.
 
-### 4. LayoutBuilder
+4. LayoutBuilder
 LayoutBuilder digunakan untuk mengetahui ukuran ruang yang tersedia sehingga tampilan dapat disesuaikan berdasarkan ukuran layar.
 
-### 5. Theme
+5. Theme
 Theme digunakan untuk mengatur tampilan aplikasi seperti warna, brightness, dan style secara konsisten. Pada aplikasi ini digunakan **Light Theme** dan **Dark Theme**.
 
 ---
@@ -430,27 +429,27 @@ Theme digunakan untuk mengatur tampilan aplikasi seperti warna, brightness, dan 
 
 Kendala yang saya temui adalah perbedaan ukuran layar saat menguji tampilan aplikasi. Pada layar yang lebih kecil, beberapa komponen dapat mengalami perubahan posisi atau overflow jika layout tidak diatur dengan baik.
 
-Untuk mengatasi kendala tersebut, saya menggunakan `LayoutBuilder` dan `GridView` agar tampilan dapat menyesuaikan ukuran layar. Saya juga melakukan pengujian pada ukuran layar yang berbeda untuk memastikan layout tetap rapi dan responsif.
+Untuk mengatasi kendala tersebut, saya menggunakan LayoutBuilder dan GridView agar tampilan dapat menyesuaikan ukuran layar. Saya juga melakukan pengujian pada ukuran layar yang berbeda untuk memastikan layout tetap rapi dan responsif.
 
 ---
 
 ## Refleksi
-### 1. Apa perbedaan cara berpikir imperative dan declarative saat membangun UI?
+1. Apa perbedaan cara berpikir imperative dan declarative saat membangun UI?
 
     Jawaban:
     Cara berpikir imperative berfokus pada langkah-langkah yang harus dilakukan untuk mengubah tampilan UI. Sedangkan declarative berfokus pada kondisi atau tampilan yang ingin dihasilkan. Pada Flutter, pendekatan declarative membuat UI dibangun berdasarkan state dan kondisi yang sedang aktif.
 
-### 2. Kapan Expanded membantu dan kapan penggunaannya justru menghasilkan layout error?
+2. Kapan Expanded membantu dan kapan penggunaannya justru menghasilkan layout error?
 
     Jawaban:
     Expanded membantu ketika widget berada di dalam Row atau Column dengan ruang yang tersedia dan ingin membagi ruang tersebut secara fleksibel. Namun, Expanded dapat menyebabkan layout error jika parent memberikan ukuran yang tidak terbatas pada arah yang sama, seperti Row di dalam horizontal SingleChildScrollView.
 
-### 3. Bagaimana breakpoint dan theme memengaruhi pengalaman pengguna?
+3. Bagaimana breakpoint dan theme memengaruhi pengalaman pengguna?
 
     Jawaban:
     Breakpoint membuat tampilan dapat menyesuaikan ukuran layar. Pada layar sempit, card ditampilkan dalam satu kolom, sedangkan pada layar lebar menjadi dua kolom. Theme juga memengaruhi kenyamanan pengguna melalui pilihan tema terang dan gelap, sehingga tampilan dapat disesuaikan dengan kondisi dan preferensi pengguna.
 
-### 4. Apa yang Anda verifikasi dari rekomendasi AI setelah tugas inti selesai?
+4. Apa yang Anda verifikasi dari rekomendasi AI setelah tugas inti selesai?
 
     Jawaban:
     Rekomendasi AI diverifikasi dengan menjalankan aplikasi dan melakukan pengujian menggunakan flutter analyze dan flutter test. Selain itu, responsive layout diuji pada ukuran layar sempit dan lebar untuk memastikan breakpoint bekerja sesuai kebutuhan. Hasil pengujian digunakan untuk memastikan bahwa rekomendasi AI tidak hanya diterapkan, tetapi juga benar-benar berjalan pada aplikasi.
