@@ -24,7 +24,7 @@ Terlihat dari kedua hasil screenshot tersebut bahwa path yang ada mengikuti id d
 
 ## Praktikum 2 - Aplikasi ToDo dengan Riverpod 
 
-Menjalankan dan memerhatikan pola mengenai ref.watch di dalam build dan ref.red di dalam callback.
+Menjalankan dan memerhatikan pola mengenai ref.watch di dalam build dan ref.read di dalam callback.
 
 Berikut merupakan tampilan awal untuk aplikasi ToDo.
 
@@ -54,271 +54,355 @@ Pada praktikum ini, terlihat pola bahwa ref.watch bertugas untuk mengawasi bagia
 
 2. Ubah build() sementara untuk melempar error: throw Exception('Gagal terhubung ke server');. Jalankan dan amati UI error beserta tombol Coba lagi.
 
-    Setelah menambahkan throw Exception di build() pada class ProductNotifier, maka sistem akan memuat data yang sangat lama sehingga menampilkan error seperti berikut beserta dengan tombol coba lagi.
+    Setelah menambahkan `throw Exception('Gagal terhubung ke server')` pada method
+    `build()` di `ProductsNotifier`, proses pengambilan data sengaja dibuat gagal. Setelah state loading selesai, Riverpod menghasilkan state error sehingga UI menampilkan pesan kegagalan beserta tombol **Coba lagi**.
 
     ![Tampilan Error](screenshots/prak3_tampilanGagalMemuat.png)
 
-    Ketika tombol Coba Lagi ditekan, sistem akan mencoba memanggil method build() kembali, namun akan gagal kembali karena masih terdapat kode program throw Exception tersebut.
+    Ketika tombol **Coba lagi** ditekan, `ref.invalidate(productsProvider)` akan menjalankan provider kembali. Namun, karena `throw Exception` masih terdapat di dalam `build()`, provider kembali menghasilkan state error.
 
 3. Tekan tombol Coba lagi, ref.invalidate membuat provider dijalankan ulang. Pulihkan kode, pastikan state success tampil.
 
     Setelah memulihkan kode program dengan menghapus kode throw Exceptionnya, maka aplikasi akan memanggil metode build() kembali dan menampilkan list sesuai dengan state success.
 
-    ![Tampilan Success](screenshots/prak3_tampilanList.png)
+    ![Tampilan Success](screenshotsprak3_tampilanList (2).png)
 
 4. Refleksikan: mengapa menampilkan ulang data lama (stale data) dengan indikator refresh kadang lebih baik daripada mengosongkan layar? Kapan pola itu penting?
 
     Menampilkan ulang data lama dengan indikator refresh lebih baik daripada mengosongkan layar, hal ini dikarenakan pengguna akan pasti paham ketika menekan tombol Coba Lagi dan muncul indikator refresh yang menandakan sistem sedang mencoba untuk mengambil suatu data. Tanpa adanya indikator tersebut, terdapat kemungkinan bahwa pengguna tidak dapat memahami apa yang sebenarnya terjadi pada aplikasinya. Pola ini penting ketika terdapat suatu event di aplikasi yang krusial, misal ketika pembayaran, feed sosial media, maupun aplikasi yang memerlukan internet sehingga menandakan jaringan dari perangkat yang terganggu. Sehingga pengguna dapat memahami konteks dari aplikasi tersebut.
 
-## AI Challenge
+# AI Challenge
 
-1. AI Agent yang dipakai: Copilot
+## 1. AI Agent yang Digunakan
 
-2. Prompt yang digunakan: 
+AI Agent yang digunakan dalam pengerjaan challenge ini adalah **ChatGPT**.
 
-    Buatkan halaman Flutter bernama StatsPage menggunakan flutter_riverpod.
-    Requirements:
-    - ConsumerWidget dengan satu AsyncNotifierProvider yang mensimulasikan
-    pengambilan data statistik (delay 2 detik, kadang gagal 30%).
-    - UI harus menangani loading (spinner), error (pesan + tombol retry),
-    dan success (ListView 3 item).
-    - Berikan unit test untuk notifier-nya.
-    Jelaskan setiap bagian kode dalam komentar.
+---
 
-3. Output awal AI:
+## 2. Prompt yang Digunakan
 
-    - main.dart
+Prompt yang diberikan kepada AI:
 
-        import 'package:flutter/material.dart';
-        import 'package:flutter_riverpod/flutter_riverpod.dart';
-        import 'pages/stats_page.dart';
+```text
+Buatkan halaman Flutter bernama StatsPage menggunakan flutter_riverpod.
+Requirements:
+- ConsumerWidget dengan satu AsyncNotifierProvider yang mensimulasikan
+  pengambilan data statistik (delay 2 detik, kadang gagal 30%).
+- UI harus menangani loading (spinner), error (pesan + tombol retry),
+  dan success (ListView 3 item).
+- Berikan widget test untuk memastikan UI bereaksi terhadap perubahan state. Jelaskan setiap bagian kode dalam komentar.
+```
 
-        void main() => runApp(const ProviderScope(child: MyApp()));
+---
 
-        class MyApp extends StatelessWidget {
-        const MyApp({super.key});
-        @override
-        Widget build(BuildContext context) => MaterialApp(
-                title: 'Week 3 - ToDo',
-                theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: true),
-                home: const StatsPage(),
+## 3. Output Awal AI
+
+### `stats_provider.dart`
+
+import 'dart:math';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Notifier ini mengelola data statistik yang dimuat secara asynchronous.
+class StatsNotifier extends AsyncNotifier<List<String>> {
+  @override
+  Future<List<String>> build() async {
+    // Simulasi proses mengambil data dari server selama 2 detik.
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Menghasilkan angka acak untuk mensimulasikan kemungkinan gagal 30%.
+    final random = Random();
+
+    if (random.nextDouble() < 0.3) {
+      throw Exception('Gagal mengambil data statistik');
+    }
+
+    // Data dikembalikan sebagai List baru sehingga tidak melakukan
+    // mutasi langsung terhadap state.
+    return [
+      'Total Pengguna: 120',
+      'Pengguna Aktif: 85',
+      'Total Transaksi: 240',
+    ];
+  }
+}
+
+// Provider memiliki tipe eksplisit.
+final statsProvider =
+    AsyncNotifierProvider<StatsNotifier, List<String>>(
+      StatsNotifier.new,
+    );
+```
+
+### `stats_page.dart`
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers/stats_provider.dart';
+
+// ConsumerWidget digunakan karena halaman perlu mengamati provider Riverpod.
+class StatsPage extends ConsumerWidget {
+  const StatsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ref.watch digunakan di dalam build agar UI otomatis diperbarui
+    // ketika state statsProvider berubah.
+    final statsAsync = ref.watch(statsProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Statistik'),
+      ),
+      body: statsAsync.when(
+        // State loading ditampilkan ketika data sedang diambil.
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+
+        // State error menampilkan pesan kesalahan dan tombol retry.
+        error: (error, stackTrace) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Gagal memuat statistik: $error'),
+              const SizedBox(height: 12),
+              FilledButton(
+                // invalidate memaksa provider menjalankan build() kembali.
+                onPressed: () {
+                  ref.invalidate(statsProvider);
+                },
+                child: const Text('Coba lagi'),
+              ),
+            ],
+          ),
+        ),
+
+        // State success menampilkan tiga data statistik menggunakan ListView.
+        data: (stats) => ListView.builder(
+          itemCount: stats.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: const Icon(Icons.bar_chart),
+              title: Text(stats[index]),
             );
-        }
+          },
+        ),
+      ),
+    );
+  }
+}
 
+### `main.dart`
 
-    - stats_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-        import 'package:flutter/material.dart';
-        import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'pages/stats_page.dart';
 
-        import '../providers/stats_provider.dart';
+void main() => runApp(
+      ProviderScope(
+        retry: (retryCount, error) => null,
+        child: const MyApp(),
+      ),
+    );
 
-        // Halaman statistik yang bereaksi terhadap tiga kemungkinan AsyncValue.
-        class StatsPage extends ConsumerWidget {
-            const StatsPage({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-            @override
-            Widget build(BuildContext context, WidgetRef ref) {
-                // Watch membuat halaman dibangun ulang saat status provider berubah.
-                final statsAsync = ref.watch(statsProvider);
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'Week 3 - AI Challenge',
+        theme: ThemeData(
+          colorSchemeSeed: Colors.teal,
+          useMaterial3: true,
+        ),
+        home: const StatsPage(),
+      );
+}
+```
 
-                return Scaffold(
-                    appBar: AppBar(title: const Text('Statistik')),
-                    body: statsAsync.when(
-                        // Spinner ditampilkan selama notifier menunggu data.
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        // Error menampilkan pesan dan memulai ulang provider saat retry ditekan.
-                        error: (error, _) => Center(
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                    Text(error.toString()),
-                                    const SizedBox(height: 12),
-                                    FilledButton(
-                                        onPressed: () => ref.invalidate(statsProvider),
-                                        child: const Text('Coba lagi'),
-                                    ),
-                                ],
-                            ),
-                        ),
-                        // Data sukses dirender sebagai tiga baris dalam ListView.
-                        data: (stats) => ListView.builder(
-                            itemCount: stats.length,
-                            itemBuilder: (context, index) {
-                                final statistic = stats[index];
-                                return ListTile(
-                                    leading: const Icon(Icons.analytics_outlined),
-                                    title: Text(statistic.label),
-                                    trailing: Text(
-                                        statistic.value,
-                                        style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                );
-                            },
-                        ),
-                    ),
-                );
-            }
-        }
+Konfigurasi `retry` pada `ProviderScope` digunakan karena project menggunakan
+`flutter_riverpod 3.4.3`. Automatic retry dinonaktifkan agar ketika simulasi
+pengambilan data gagal, state error dapat langsung diamati pada UI sesuai
+kebutuhan praktikum.
 
+---
 
-    - stats_provider.dart
+## 4. Hasil Implementasi
 
-        import 'dart:math';
+### Tampilan Loading
 
-        import 'package:flutter/foundation.dart';
-        import 'package:flutter_riverpod/flutter_riverpod.dart';
+Pada saat `StatsNotifier` melakukan simulasi pengambilan data selama 2 detik,
+aplikasi menampilkan `CircularProgressIndicator`.
 
-        // Model kecil yang menyimpan satu baris statistik untuk ditampilkan di UI.
-        @immutable
-        class Statistic {
-            const Statistic({required this.label, required this.value});
+![Tampilan Loading](screenshots/ai_tampilanLoading.png)
 
-            final String label;
-            final String value;
-        }
+### Tampilan Success
 
-        // Provider tunggal yang mengelola status loading, error, dan data statistik.
-        final statsProvider = AsyncNotifierProvider<StatsNotifier, List<Statistic>>(
-            StatsNotifier.new,
-        );
+Apabila proses pengambilan data berhasil, aplikasi menampilkan tiga data
+statistik menggunakan `ListView`.
 
-        // AsyncNotifier menjalankan pengambilan data ketika provider pertama kali dibaca.
-        class StatsNotifier extends AsyncNotifier<List<Statistic>> {
-            // Random dan delay dapat diganti dalam unit test agar hasilnya deterministik.
-            StatsNotifier({Random? random, Duration? delay})
-                    : _random = random ?? Random(),
-                        _delay = delay ?? const Duration(seconds: 2);
+![Tampilan Success](screenshots/ai_tampilanSuccess.png)
 
-            final Random _random;
-            final Duration _delay;
+### Tampilan Error
 
-            @override
-            Future<List<Statistic>> build() async {
-                // Simulasikan waktu yang dibutuhkan oleh request ke server.
-                await Future<void>.delayed(_delay);
+Apabila simulasi menghasilkan kegagalan, aplikasi menampilkan pesan error
+beserta tombol **Coba lagi**.
 
-                // Simulasikan kegagalan jaringan pada 30% kemungkinan.
-                if (_random.nextDouble() < 0.3) {
-                    throw Exception('Data statistik gagal dimuat.');
-                }
+![Tampilan Error](screenshots/ai_tampilanError.png)
 
-                // Data sukses selalu terdiri dari tiga statistik.
-                return const [
-                    Statistic(label: 'Total tugas', value: '24'),
-                    Statistic(label: 'Tugas selesai', value: '18'),
-                    Statistic(label: 'Tugas tertunda', value: '6'),
-                ];
-            }
-        }
+---
 
-    - stats_notifier_test.dart
+## 5. AI Verification Checklist
 
-        import 'dart:math';
+### a. Apakah state diubah secara immutable?
 
-        import 'package:flutter_riverpod/flutter_riverpod.dart';
-        import 'package:flutter_test/flutter_test.dart';
-        import 'package:week3_todo/providers/stats_provider.dart';
+**Ya.**
 
-        // Random palsu membuat cabang sukses dan gagal dapat diuji tanpa flaky test.
-        class FixedRandom extends Random {
-            FixedRandom(this.result);
+Data statistik dibuat dan dikembalikan sebagai `List<String>` baru dari method
+`build()`. Tidak ditemukan penggunaan `state.add()`, `state.remove()`, atau
+mutasi langsung terhadap list yang tersimpan pada state.
 
-            final double result;
+Contoh:
 
-            @override
-            double nextDouble() => result;
-        }
+return [
+  'Total Pengguna: 120',
+  'Pengguna Aktif: 85',
+  'Total Transaksi: 240',
+];
 
-        void main() {
-            test('notifier mengembalikan tiga statistik saat request sukses', () async {
-                final container = ProviderContainer(
-                    overrides: [
-                        statsProvider.overrideWith(
-                            () => StatsNotifier(
-                                random: FixedRandom(0.9),
-                                delay: Duration.zero,
-                            ),
-                        ),
-                    ],
-                );
-                addTearDown(container.dispose);
+Dengan demikian, implementasi telah mengikuti prinsip immutable state.
 
-                final stats = await container.read(statsProvider.future);
+### b. Apakah `ref.watch` hanya dipakai di dalam `build`, dan `ref.read` di callback?
 
-                expect(stats, hasLength(3));
-                expect(stats.first.label, 'Total tugas');
-            });
+**Ya untuk penggunaan `ref.watch`.**
 
-            test('notifier menghasilkan error saat simulasi request gagal', () async {
-                final container = ProviderContainer(
-                    overrides: [
-                        statsProvider.overrideWith(
-                            () => StatsNotifier(
-                                random: FixedRandom(0.1),
-                                delay: Duration.zero,
-                            ),
-                        ),
-                    ],
-                );
-                addTearDown(container.dispose);
+`ref.watch(statsProvider)` hanya digunakan di dalam method `build()` pada
+`StatsPage`.
 
-                expect(
-                    () => container.read(statsProvider.future),
-                    throwsA(isA<Exception>()),
-                );
-            });
-        }
+final statsAsync = ref.watch(statsProvider);
 
-    Berikut merupakan hasil run untuk aplikasinya.
+Pada callback tombol retry tidak diperlukan `ref.watch`. Implementasi
+menggunakan:
 
-    Tampilan list:
+ref.invalidate(statsProvider);
 
-    ![Tampilan List](screenshots/ai_tampilanList.png)
+untuk menginvalidasi state lama dan menjalankan kembali provider.
 
-    Tampilan loading:
+Dengan demikian, tidak terdapat penggunaan `ref.watch` di dalam callback.
 
-    ![Tampilan Loading](screenshots/ai_tampilanLoading.png)
+### c. Apakah ketiga state `AsyncValue` benar-benar ditangani?
 
-    Tampilan error:
+**Ya.**
 
-    ![Tampilan Error](screenshots/ai_tampilanError.png)
+Ketiga state `AsyncValue` ditangani menggunakan method `when()`:
 
-4. AI Verification Checklist
+- `loading` menampilkan `CircularProgressIndicator`.
+- `error` menampilkan pesan kesalahan dan tombol **Coba lagi**.
+- `data` menampilkan tiga data statistik menggunakan `ListView`.
 
-    a. Apakah state diubah secara immutable (tidak ada state.add() atau mutasi list langsung)?
+statsAsync.when(
+  loading: () => const Center(
+    child: CircularProgressIndicator(),
+  ),
+  error: (error, stackTrace) => ...,
+  data: (stats) => ListView.builder(...),
+);
 
-        Ya, state diubah secara immutable. Hal ini dibuktikan dengan class Statistic dibuat immutable menggunakan anotasi @immutable dan variabel final.
+Pengujian secara langsung juga menunjukkan bahwa ketiga kondisi tersebut dapat
+ditampilkan oleh aplikasi.
 
-    b. Apakah ref.watch hanya dipakai di dalam build, dan ref.read di callback?
+### d. Apakah provider dideklarasikan dengan tipe eksplisit dan tidak duplikat dengan provider lain?
 
-        Ya, ref.watch hanya dipakai di dalam method build() di class StatsPage. Untuk ref.read, pada kode program tidak ditemukan sintaks tersebut, namun untuk callback, ia hanya menggunakan ref.invalidate().
+**Ya.**
 
-    c. Apakah ketiga state AsyncValue benar-benar ditangani (bukan hanya success)?
+Provider dideklarasikan menggunakan:
 
-        Ya, ketiga state benar benar ditangani untuk loading, success, dan error. Hal ini dapat dibuktikan dengan loading yang menampilkan spinner, error yang menampilkan pesan error, dan success yang menampilkan ListView.
+AsyncNotifierProvider<StatsNotifier, List<String>>
 
-    d. Apakah provider dideklarasikan dengan tipe eksplisit dan tidak duplikat dengan provider lain?
+dengan nama:
 
-        Ya, provider dideklarasikan dengan AsyncNotifierProvider<StatsNotifier List<Statistic>>. Nama provider juga dibuat berbeda dari nama provider lain, yakni statsProvider.
+statsProvider
 
-    e. Apakah kode AI memakai API Riverpod versi lama (StateProvider antipattern, StateNotifierProvider usang, atau Consumer bertingkat yang tidak perlu)? Perbaiki ke pola Notifier/ConsumerWidget.
+Provider tersebut memiliki nama yang berbeda dari provider lain yang sebelumnya
+digunakan pada project, seperti `todoListProvider` dan `productsProvider`,
+sehingga tidak terjadi duplikasi provider.
 
-        Kode program yang telah digenerate tidak menggunakan API Riverpod yang lama. Hal ini dibuktikan dengan kode program yang menggunakan sintaks AsyncNotifier dan AsyncNotifierProvider. Untuk UI ia meng-extend ConsumerWidget, sehingga tidak menggunakan Consumer yang tidak perlu.
+### e. Apakah kode AI menggunakan API Riverpod versi lama?
 
-    f. Jalankan flutter analyze dan flutter test, apakah hasil AI lolos tanpa warning?
+**Tidak.**
 
-        Setelah menjalankan flutter analyze, tidak ditemukan masalah untuk flutter analyze.
+Implementasi tidak menggunakan `StateProvider`, `StateNotifierProvider`, maupun
+`Consumer` bertingkat.
 
-        Bukti screenshot:
+State asynchronous dikelola menggunakan:
 
-    ![Flutter Analyze](screenshots/ai_flutterAnalyze.png)
+AsyncNotifier<List<String>>
 
-        Setelah menjalankan flutter test, ditemukan 1 masalah yakni mengenai Error TimeoutException dan StateError yang terjadi karena ProviderContainer di-disposed terlalu cepat oleh fungsi addTearDown sebelum proses asynchronous pada AsyncNotifier selesai menangani exception. Karena tidak ada listener aktif yang mendengarkan perubahan state, Riverpod menganggap provider dibuang saat masih dalam kondisi loading, yang menyebabkan tes menggantung selama 30 detik hingga akhirnya memicu timeout.
+dan:
 
-        Bukti screenshot:
+AsyncNotifierProvider<StatsNotifier, List<String>>
 
-    ![Flutter Test](screenshots/ai_flutterTes.png)
+Sedangkan halaman menggunakan:
+
+class StatsPage extends ConsumerWidget
+
+Dengan demikian, implementasi telah menggunakan pola Riverpod yang sesuai
+dengan materi, yaitu `AsyncNotifier`, `AsyncNotifierProvider`, dan
+`ConsumerWidget`.
+
+### f. Apakah `flutter analyze` dan `flutter test` berhasil?
+
+Setelah menjalankan `flutter analyze`, tidak ditemukan masalah pada kode program.
+
+Hasil:
+
+`No issues found! (ran in 3.4s)`
+
+Bukti screenshot:
+
+![Flutter Analyze](screenshots/ai_flutterAnalyze.png)
+
+Kemudian dilakukan pengujian dengan:
+flutter test
+
+Setelah menjalankan `flutter test`, ditemukan error pada pengujian
+`Counter increments smoke test` di file `test/widget_test.dart`.
+
+Error terjadi karena pengujian tersebut masih merupakan test bawaan
+project Flutter yang mencari tampilan counter dengan teks "0" dan "1".
+Sementara itu, aplikasi telah diubah menjadi StatsPage sehingga widget
+counter tersebut sudah tidak tersedia.
+
+Pesan error yang muncul antara lain:
+
+`Expected: exactly one matching candidate`
+`Actual: Found 0 widgets with text "0"`
+
+Dengan demikian, kegagalan `flutter test` berasal dari `widget_test.dart`
+bawaan yang sudah tidak sesuai dengan implementasi aplikasi saat ini.
+
+Bukti screenshot:
+
+![Flutter Test](screenshots/ai_flutterTest.png)
+
+---
+
+## 6. Kesimpulan Verifikasi AI
+
+Berdasarkan proses verifikasi, kode yang dihasilkan AI telah menggunakan
+`AsyncNotifierProvider` dan `ConsumerWidget` serta menangani kondisi loading,
+error, dan success menggunakan `AsyncValue`.
+
+Kode AI tidak langsung diterima tanpa pemeriksaan. Implementasi diperiksa
+kembali dari sisi immutable state, penggunaan `ref.watch`, deklarasi provider,
+API Riverpod yang digunakan, serta hasil `flutter analyze` dan `flutter test`.
+
+Penyesuaian juga dilakukan terhadap Riverpod versi 3.4.3 dengan menonaktifkan
+automatic retry pada `ProviderScope` agar state error dapat diamati sesuai
+kebutuhan praktikum.
 
 ## Refactor Challenge
 
@@ -371,3 +455,15 @@ Pada praktikum ini, terlihat pola bahwa ref.watch bertugas untuk mengawasi bagia
     Jawaban: Pendekatan yang mengandalkan tiga variabel status terpisah rentan menimbulkan bug logika invalid state. AsyncValue dari Riverpod memecahkan masalah ini dengan menerapkan arsitektur sealed class, yang menjamin bahwa state aplikasi hanya bisa berada pada satu dari tiga kondisi sah pada satu waktu yakni antara AsyncLoading, AsyncError, atau AsyncData.
 
 4. Bagian mana dari hasil AI yang Anda perbaiki, dan mengapa?
+
+    Jawaban: Bagian yang diperbaiki meliputi konfigurasi `ProviderScope`,
+    navigasi, serta pengujian. Pada Riverpod 3.4.3, automatic retry
+    dinonaktifkan agar state error dapat diamati sesuai kebutuhan praktikum.
+    Aplikasi kemudian diintegrasikan dengan GoRouter agar halaman ToDo dan
+    Statistik dapat diakses melalui route `/` dan `/stats`.
+
+    Pengujian bawaan Flutter juga diperbaiki karena masih menguji aplikasi
+    counter yang sudah tidak digunakan. Widget test kemudian disesuaikan untuk
+    menguji proses penambahan ToDo. Setelah perbaikan, `flutter analyze`
+    menghasilkan `No issues found!` dan `flutter test` menghasilkan
+    `All tests passed!`.
