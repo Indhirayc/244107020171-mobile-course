@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../providers/stats_provider.dart';
 
@@ -17,6 +18,7 @@ class StatsPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Statistik'),
       ),
+
       body: statsAsync.when(
         // State loading ditampilkan ketika data sedang diambil.
         loading: () => const Center(
@@ -31,8 +33,8 @@ class StatsPage extends ConsumerWidget {
               Text('Gagal memuat statistik: $error'),
               const SizedBox(height: 12),
               FilledButton(
-                // ref.read digunakan pada callback.
-                // invalidate memaksa provider menjalankan build() kembali.
+                // Provider di-invalidasi agar proses pengambilan data
+                // dijalankan kembali.
                 onPressed: () {
                   ref.invalidate(statsProvider);
                 },
@@ -42,7 +44,7 @@ class StatsPage extends ConsumerWidget {
           ),
         ),
 
-        // State success menampilkan tiga data statistik menggunakan ListView.
+        // State success menampilkan tiga data statistik.
         data: (stats) => ListView.builder(
           itemCount: stats.length,
           itemBuilder: (context, index) {
@@ -52,6 +54,26 @@ class StatsPage extends ConsumerWidget {
             );
           },
         ),
+      ),
+
+      // NavigationBar untuk berpindah antara halaman ToDo dan Statistik.
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: 1,
+        onDestinationSelected: (index) {
+          if (index == 0) {
+            context.go('/');
+          }
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.checklist),
+            label: 'ToDo',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistik',
+          ),
+        ],
       ),
     );
   }
