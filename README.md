@@ -52,6 +52,10 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 
 * **Flutter** — Framework pengembangan aplikasi mobile
 * **Dart** — Bahasa pemrograman utama
+* **Riverpod** — State management
+* **GoRouter** — Navigasi dan routing
+* **Dio** — HTTP client untuk REST API
+* **JSONPlaceholder** — Dummy REST API untuk praktikum
 * **Android Studio** — Android development environment
 * **Android SDK** — Tools dan platform Android
 * **Visual Studio Code** — Code editor
@@ -66,8 +70,8 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 | :----: | ---------------------------------------------- | :-------: |
 |   01   | Mobile Development Ecosystem & Flutter Refresh | ✅ Selesai |
 |   02   | Declarative UI & Responsive Design             | ✅ Selesai |
-|   03   | Navigation & State Management                  |  ⏳ Belum  |
-|   04   | Networking & REST API                          |  ⏳ Belum  |
+|   03   | Navigation & State Management                  | ✅ Selesai |
+|   04   | Networking & REST API                          | ✅ Selesai |
 |   05   | Local Storage & Offline First                  |  ⏳ Belum  |
 |   06   | Authentication, Security & FCM                 |  ⏳ Belum  |
 |   07   | Clean Architecture                             |  ⏳ Belum  |
@@ -96,6 +100,21 @@ Mempelajari dasar ekosistem pengembangan aplikasi mobile dan melakukan refresh t
 Mempelajari konsep **declarative UI** pada Flutter serta penerapan layout yang responsif menggunakan berbagai widget dan teknik layout.
 
 **Status:** ✅ Selesai
+
+### Week 03 — Navigation & State Management
+
+Mempelajari navigasi antar halaman menggunakan **GoRouter** serta pengelolaan state menggunakan **Riverpod**. Praktikum mencakup navigasi multi-page, aplikasi ToDo, penggunaan Provider dan AsyncNotifier, serta penanganan state loading, error, dan success menggunakan AsyncValue.
+
+**Status:** ✅ Selesai
+
+### Week 04 — Networking & REST API
+
+Mempelajari integrasi aplikasi Flutter dengan **REST API** menggunakan Dio, penerapan repository pattern, model JSON yang aman terhadap null, serta state management menggunakan Riverpod.
+
+Praktikum juga mencakup error handling, pagination dan infinite scroll, penggunaan GoRouter untuk halaman detail post, refactoring komponen, serta unit testing menggunakan fake repository tanpa melakukan HTTP request secara langsung.
+
+**Status:** ✅ Selesai
+
 
 ---
 
