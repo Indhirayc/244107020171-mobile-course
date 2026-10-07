@@ -56,6 +56,8 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 * **GoRouter** — Navigasi dan routing
 * **Dio** — HTTP client untuk REST API
 * **JSONPlaceholder** — Dummy REST API untuk praktikum
+* **SharedPreferences** — Penyimpanan key-value untuk preferensi lokal
+* **sqflite (SQLite)** — Database lokal untuk penyimpanan data terstruktur dan offline
 * **Android Studio** — Android development environment
 * **Android SDK** — Tools dan platform Android
 * **Visual Studio Code** — Code editor
@@ -72,7 +74,7 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   02   | Declarative UI & Responsive Design             | ✅ Selesai |
 |   03   | Navigation & State Management                  | ✅ Selesai |
 |   04   | Networking & REST API                          | ✅ Selesai |
-|   05   | Local Storage & Offline First                  |  ⏳ Belum  |
+|   05   | Local Storage & Offline First                  | ✅ Selesai|
 |   06   | Authentication, Security & FCM                 |  ⏳ Belum  |
 |   07   | Clean Architecture                             |  ⏳ Belum  |
 |   08   | Mid Project Review & Code Review               |  ⏳ Belum  |
@@ -115,6 +117,15 @@ Praktikum juga mencakup error handling, pagination dan infinite scroll, pengguna
 
 **Status:** ✅ Selesai
 
+### Week 05 — Local Storage & Offline First
+
+Mempelajari penyimpanan data lokal pada Flutter menggunakan **SharedPreferences** untuk preferensi sederhana dan **SQLite (sqflite)** untuk penyimpanan data terstruktur secara persisten.
+
+Praktikum mencakup penerapan repository pattern, Riverpod, cache-first untuk data API, dirty flag dan proses sinkronisasi catatan, simulasi kondisi offline, serta penyimpanan cache agar data tetap dapat diakses tanpa koneksi internet.
+
+Selain itu, dilakukan refactoring dengan memisahkan widget `NoteTile` dan logika sinkronisasi, menambahkan halaman detail catatan menggunakan **GoRouter**, serta melakukan unit testing menggunakan fake repository tanpa bergantung pada database SQLite sungguhan.
+
+**Status:** ✅ Selesai
 
 ---
 
