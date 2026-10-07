@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'pages/notes_page.dart';
 import 'pages/settings_page.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -29,9 +26,8 @@ class MyApp extends ConsumerWidget {
         colorSchemeSeed: Colors.indigo,
         brightness: Brightness.dark,
       ),
-      themeMode:
-          darkMode.value == true ? ThemeMode.dark : ThemeMode.light,
-      home: const SettingsPage(),
+      themeMode: darkMode.value == true ? ThemeMode.dark : ThemeMode.light,
+      home: const NotesPage(),
     );
   }
 }
