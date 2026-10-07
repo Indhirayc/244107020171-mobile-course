@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_client.dart';
 import 'models/post.dart';
 import 'repositories/post_repository.dart';
+import 'sync.dart';
 
 final dioProvider = Provider<Dio>(
   (ref) => createDio(),
@@ -17,9 +18,7 @@ final postRepositoryProvider = Provider<PostRepository>(
 
 final cachedPostsProvider = FutureProvider<List<Post>>(
   (ref) {
-    return ref
-        .watch(postRepositoryProvider)
-        .readCachedPosts();
+    return readCachedPosts();
   },
 );
 
@@ -27,7 +26,8 @@ final postsCacheFirstProvider = FutureProvider<List<Post>>(
   (ref) {
     final repository = ref.watch(postRepositoryProvider);
 
-    return repository.loadPostsCacheFirst(
+    return loadPostsCacheFirst(
+      repository,
       onCacheUpdated: () {
         ref.invalidate(cachedPostsProvider);
       },
