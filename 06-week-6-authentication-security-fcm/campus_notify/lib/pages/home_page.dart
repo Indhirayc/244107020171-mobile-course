@@ -14,10 +14,10 @@ class HomePage extends ConsumerWidget {
         title: const Text('Campus Notify'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authStateProvider.notifier).logout();
+            onPressed: () {
+              ref.read(authStateProvider.notifier).logout();
             },
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
@@ -25,11 +25,28 @@ class HomePage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Login berhasil!'),
-            const SizedBox(height: 16),
+            const Text(
+              'Login berhasil',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('Selamat datang di Campus Notify'),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => context.go('/pengumuman/1'),
-              child: const Text('Lihat Pengumuman'),
+              onPressed: () {
+                context.go('/pengumuman/1');
+              },
+              child: const Text('Buka Pengumuman'),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              onPressed: () {
+                context.push('/debug');
+              },
+              child: const Text('Debug FCM'),
             ),
           ],
         ),
