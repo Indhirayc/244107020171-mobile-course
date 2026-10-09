@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,9 @@ import 'providers/auth_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Firebase.
   await Firebase.initializeApp();
 
-  // Inisialisasi notifikasi lokal.
-  await initLocalNotifications();
+  registerBackgroundHandler();
 
   runApp(
     const ProviderScope(
@@ -36,6 +35,7 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> {
   late final GoRouter router;
+  String? _pendingNotificationRoute;
 
   @override
   void initState() {
@@ -43,8 +43,6 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     router = GoRouter(
       initialLocation: '/login',
-
-      // Redirect berdasarkan status autentikasi.
       redirect: (context, state) {
         final authState = ref.read(authStateProvider);
 
@@ -55,31 +53,42 @@ class _MyAppState extends ConsumerState<MyApp> {
         final loggedIn = authState.asData?.value ?? false;
         final goingLogin = state.matchedLocation == '/login';
 
-        if (!loggedIn && !goingLogin) {
-          return '/login';
+        if (!loggedIn) {
+          return goingLogin ? null : '/login';
         }
 
-        if (loggedIn && goingLogin) {
+        // Setelah login siap, buka tujuan notifikasi yang disimpan.
+        final pendingRoute = _pendingNotificationRoute;
+
+        if (pendingRoute != null) {
+          _pendingNotificationRoute = null;
+
+          if (state.matchedLocation != pendingRoute) {
+            return pendingRoute;
+          }
+
+          return null;
+        }
+
+        if (goingLogin) {
           return '/';
         }
 
         return null;
       },
-
       routes: [
-        // Halaman login.
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginPage(),
         ),
-
-        // Halaman utama.
         GoRoute(
           path: '/',
           builder: (context, state) => const HomePage(),
         ),
-
-        // Halaman detail pengumuman.
+        GoRoute(
+          path: '/debug',
+          builder: (context, state) => const DebugPage(),
+        ),
         GoRoute(
           path: '/pengumuman/:id',
           builder: (context, state) {
@@ -88,55 +97,57 @@ class _MyAppState extends ConsumerState<MyApp> {
             );
           },
         ),
-
-        // Halaman Debug FCM.
-        GoRoute(
-          path: '/debug',
-          builder: (context, state) => const DebugPage(),
-        ),
       ],
     );
 
-    // Minta izin notifikasi setelah frame pertama.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _requestPermission();
+
+      unawaited(_initMessaging());
     });
   }
 
-  
-  Future<void> _requestPermission() async {
+  Future<void> _initMessaging() async {
     try {
-      // Meminta izin notifikasi.
+      void goFromNotification(String route) {
+        if (!mounted) return;
+
+        // Simpan tujuan, lalu minta router memeriksa status login.
+        _pendingNotificationRoute = route;
+        router.refresh();
+      }
+
+      await initLocalNotifications(goFromNotification);
+      await listenForeground(goFromNotification);
+
+      // Proses notifikasi yang membuka aplikasi dari terminated.
+      await handleTerminated(goFromNotification);
+
       final granted = await requestNotificationPermission();
 
-      if (!mounted) return;
+      if (!granted) {
+        debugPrint('Izin notifikasi belum diberikan.');
+        return;
+      }
 
-      debugPrint(
-        granted
-            ? 'Izin notifikasi diberikan.'
-            : 'Izin notifikasi belum diberikan.',
-      );
+      debugPrint('Izin notifikasi diberikan.');
 
-      // Inisialisasi FCM Token Lifecycle.
       await initFcmToken(
         onToken: (token) async {
-          // Backend belum tersedia pada praktikum ini.
-          // Token tidak dicetak secara penuh.
-          debugPrint('FCM token berhasil diterima.');
+          debugPrint(
+            'Token FCM diterima; backend belum dikonfigurasi.',
+          );
         },
       );
 
-      debugPrint('FCM Token Lifecycle berhasil diinisialisasi.');
-    } catch (e) {
-      debugPrint('Gagal menginisialisasi FCM: $e');
+      debugPrint('Inisialisasi FCM dan notifikasi lokal selesai.');
+    } catch (error) {
+      debugPrint('Inisialisasi messaging gagal: $error');
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    // Refresh GoRouter ketika status login berubah.
     ref.listen(authStateProvider, (previous, next) {
       router.refresh();
     });
@@ -150,6 +161,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   void dispose() {
+    unawaited(disposeMessageListeners());
+    unawaited(disposeFcmToken());
+
     router.dispose();
     super.dispose();
   }
