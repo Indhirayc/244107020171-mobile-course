@@ -63,6 +63,11 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 * **Visual Studio Code** — Code editor
 * **Git** — Version control
 * **GitHub** — Repository dan dokumentasi project
+* **Firebase Cloud Messaging (FCM)** — Push notification dan topic messaging
+* **flutter_local_notifications** — Menampilkan notifikasi lokal
+* **flutter_secure_storage** — Penyimpanan token autentikasi secara aman
+* **GitHub Copilot** — AI-assisted development dan refactoring
+* **Flutter Test** — Unit testing dan widget testing
 
 ---
 
@@ -74,8 +79,8 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   02   | Declarative UI & Responsive Design             | ✅ Selesai |
 |   03   | Navigation & State Management                  | ✅ Selesai |
 |   04   | Networking & REST API                          | ✅ Selesai |
-|   05   | Local Storage & Offline First                  | ✅ Selesai|
-|   06   | Authentication, Security & FCM                 |  ⏳ Belum  |
+|   05   | Local Storage & Offline First                  | ✅ Selesai |
+|   06   | Authentication, Security & FCM                 | ✅ Selesai |
 |   07   | Clean Architecture                             |  ⏳ Belum  |
 |   08   | Mid Project Review & Code Review               |  ⏳ Belum  |
 |   09   | AI-assisted Development / Vibe Coding          |  ⏳ Belum  |
@@ -124,6 +129,18 @@ Mempelajari penyimpanan data lokal pada Flutter menggunakan **SharedPreferences*
 Praktikum mencakup penerapan repository pattern, Riverpod, cache-first untuk data API, dirty flag dan proses sinkronisasi catatan, simulasi kondisi offline, serta penyimpanan cache agar data tetap dapat diakses tanpa koneksi internet.
 
 Selain itu, dilakukan refactoring dengan memisahkan widget `NoteTile` dan logika sinkronisasi, menambahkan halaman detail catatan menggunakan **GoRouter**, serta melakukan unit testing menggunakan fake repository tanpa bergantung pada database SQLite sungguhan.
+
+**Status:** ✅ Selesai
+
+### Week 06 — Authentication, Security & FCM
+
+Mempelajari implementasi **autentikasi dan keamanan aplikasi Flutter**, meliputi login, penyimpanan token menggunakan **flutter_secure_storage**, pengelolaan sesi pengguna, refresh token otomatis menggunakan **Dio Interceptor**, serta proteksi halaman menggunakan **GoRouter** dan **Riverpod**.
+
+Praktikum juga mencakup integrasi **Firebase Cloud Messaging (FCM)** untuk mengelola izin notifikasi, token lifecycle (`getToken` dan `onTokenRefresh`), penerimaan notifikasi pada kondisi **foreground, background, dan terminated**, navigasi melalui deep link, serta pengelolaan topic messaging menggunakan `subscribeToTopic()` dan `unsubscribeFromTopic()`.
+
+Selain itu, dilakukan **AI Challenge menggunakan GitHub Copilot**, refactoring struktur kode, pemisahan konstanta route dan penanganan error API, serta unit testing dan widget testing. Pengujian terakhir menunjukkan **11 test berhasil dijalankan**, termasuk smoke test yang mengisolasi inisialisasi Firebase Messaging.
+
+Integrasi backend untuk registrasi token perangkat masih menggunakan konfigurasi contoh dan belum diverifikasi dengan server produksi.
 
 **Status:** ✅ Selesai
 
