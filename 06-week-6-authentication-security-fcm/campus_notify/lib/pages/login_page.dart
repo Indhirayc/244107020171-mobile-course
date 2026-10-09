@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 
+import '../data/api_errors.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -31,8 +33,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authState = ref.read(authStateProvider);
 
     if (authState.hasError) {
+      final error = authState.error!;
+      final message = error is DioException
+          ? apiErrorMessage(error)
+          : error.toString();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: ${authState.error}')),
+        SnackBar(content: Text('Login gagal: $message')),
       );
     }
   }

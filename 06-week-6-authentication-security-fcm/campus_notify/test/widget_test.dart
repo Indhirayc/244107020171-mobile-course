@@ -8,10 +8,13 @@ void main() {
   testWidgets('Campus Notify app smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
-        child: MyApp(),
+        child: MyApp(
+          enableMessaging: false,
+        ),
       ),
     );
 
     expect(find.byType(MaterialApp), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

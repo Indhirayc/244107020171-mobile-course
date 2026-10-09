@@ -5,21 +5,17 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../routes.dart';
+
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(
-  RemoteMessage message,
-) async {
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
-  debugPrint(
-    'FCM background diterima. Message ID: ${message.messageId}',
-  );
+  debugPrint('FCM background diterima. Message ID: ${message.messageId}');
 }
 
 void registerBackgroundHandler() {
-  FirebaseMessaging.onBackgroundMessage(
-    firebaseMessagingBackgroundHandler,
-  );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 }
 
 final fcmTokenPreview = ValueNotifier<String>('Belum tersedia');
@@ -61,8 +57,7 @@ Future<void> initFcmToken({
     await onToken(token);
   }
 
-  _tokenSubscription =
-      FirebaseMessaging.instance.onTokenRefresh.listen(
+  _tokenSubscription = FirebaseMessaging.instance.onTokenRefresh.listen(
     (token) async {
       try {
         await handleToken(token, 'onTokenRefresh');
@@ -83,9 +78,7 @@ Future<void> initFcmToken({
     fcmTokenPreview.value = 'Token belum tersedia';
   }
 
-  await FirebaseMessaging.instance.subscribeToTopic(
-    'pengumuman-kampus',
-  );
+  await FirebaseMessaging.instance.subscribeToTopic('pengumuman-kampus');
 
   fcmTopicStatus.value = 'Berlangganan pengumuman-kampus';
 }
@@ -100,23 +93,9 @@ final _local = FlutterLocalNotificationsPlugin();
 StreamSubscription<RemoteMessage>? _foregroundSubscription;
 StreamSubscription<RemoteMessage>? _openedAppSubscription;
 
-
 String? pendingDeepLink;
 
-String _notificationRoute(String? route) {
-  if (route == '/') return '/';
-
-  if (route != null &&
-      RegExp(r'^/pengumuman/[0-9]+$').hasMatch(route)) {
-    return route;
-  }
-
-  return '/';
-}
-
-Future<void> initLocalNotifications(
-  void Function(String route) go,
-) async {
+Future<void> initLocalNotifications(void Function(String route) go) async {
   const settings = InitializationSettings(
     android: AndroidInitializationSettings('@mipmap/ic_launcher'),
   );
@@ -124,7 +103,7 @@ Future<void> initLocalNotifications(
   await _local.initialize(
     settings: settings,
     onDidReceiveNotificationResponse: (response) {
-      final route = _notificationRoute(response.payload);
+      final route = routeFromPath(response.payload);
 
       debugPrint('Notifikasi lokal diklik: $route');
       go(route);
@@ -140,61 +119,53 @@ Future<void> initLocalNotifications(
 
   await _local
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(channel);
 
   final launchDetails = await _local.getNotificationAppLaunchDetails();
 
   if (launchDetails?.didNotificationLaunchApp ?? false) {
-    pendingDeepLink = _notificationRoute(
+    pendingDeepLink = routeFromPath(
       launchDetails?.notificationResponse?.payload,
     );
   }
 }
 
-Future<void> listenForeground(
-  void Function(String route) go,
-) async {
+Future<void> listenForeground(void Function(String route) go) async {
   await _foregroundSubscription?.cancel();
   await _openedAppSubscription?.cancel();
 
-  _foregroundSubscription = FirebaseMessaging.onMessage.listen(
-    (message) async {
-      try {
-        final route = _notificationRoute(
-          message.data['route']?.toString(),
-        );
+  _foregroundSubscription = FirebaseMessaging.onMessage.listen((message) async {
+    try {
+      final route = routeFromMessage(message.data);
 
-        debugPrint('FCM foreground diterima: $route');
+      debugPrint('FCM foreground diterima: $route');
 
-        const androidDetails = AndroidNotificationDetails(
-          'pengumuman',
-          'Pengumuman Kampus',
-          channelDescription: 'Notifikasi pengumuman kampus',
-          importance: Importance.high,
-          priority: Priority.high,
-        );
+      const androidDetails = AndroidNotificationDetails(
+        'pengumuman',
+        'Pengumuman Kampus',
+        channelDescription: 'Notifikasi pengumuman kampus',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
 
-        await _local.show(
-          id: message.hashCode & 0x7fffffff,
-          title: message.notification?.title ?? 'Pengumuman',
-          body: message.notification?.body ?? '',
-          notificationDetails: const NotificationDetails(
-            android: androidDetails,
-          ),
-          payload: route,
-        );
-      } catch (error) {
-        debugPrint('Gagal menampilkan notifikasi lokal: $error');
-      }
-    },
-  );
+      await _local.show(
+        id: message.hashCode & 0x7fffffff,
+        title: message.notification?.title ?? 'Pengumuman',
+        body: message.notification?.body ?? '',
+        notificationDetails: const NotificationDetails(android: androidDetails),
+        payload: route,
+      );
+    } catch (error) {
+      debugPrint('Gagal menampilkan notifikasi lokal: $error');
+    }
+  });
 
-  _openedAppSubscription =
-      FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    final route = _notificationRoute(
-      message.data['route']?.toString(),
-    );
+  _openedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen((
+    message,
+  ) {
+    final route = routeFromMessage(message.data);
 
     debugPrint('Notifikasi background diklik: $route');
     go(route);
@@ -209,18 +180,14 @@ Future<void> disposeMessageListeners() async {
   _openedAppSubscription = null;
 }
 
-Future<void> handleTerminated(
-  void Function(String route) go,
-) async {
+Future<void> handleTerminated(void Function(String route) go) async {
   final initial = await FirebaseMessaging.instance.getInitialMessage();
 
   final localRoute = pendingDeepLink;
   pendingDeepLink = null;
 
   if (initial != null) {
-    final route = _notificationRoute(
-      initial.data['route']?.toString(),
-    );
+    final route = routeFromMessage(initial.data);
 
     debugPrint('Notifikasi terminated diklik: $route');
     go(route);
@@ -231,18 +198,14 @@ Future<void> handleTerminated(
 }
 
 Future<void> subscribePengumuman() async {
-  await FirebaseMessaging.instance.subscribeToTopic(
-    'pengumuman-kampus',
-  );
+  await FirebaseMessaging.instance.subscribeToTopic('pengumuman-kampus');
 
   fcmTopicStatus.value = 'Berlangganan pengumuman-kampus';
   debugPrint('Subscribe pengumuman-kampus berhasil.');
 }
 
 Future<void> unsubscribePengumuman() async {
-  await FirebaseMessaging.instance.unsubscribeFromTopic(
-    'pengumuman-kampus',
-  );
+  await FirebaseMessaging.instance.unsubscribeFromTopic('pengumuman-kampus');
 
   fcmTopicStatus.value = 'Tidak berlangganan pengumuman-kampus';
   debugPrint('Unsubscribe pengumuman-kampus berhasil.');

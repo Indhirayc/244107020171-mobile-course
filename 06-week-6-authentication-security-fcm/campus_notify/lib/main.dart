@@ -11,6 +11,7 @@ import 'pages/debug_page.dart';
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'providers/auth_provider.dart';
+import 'routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +28,12 @@ Future<void> main() async {
 }
 
 class MyApp extends ConsumerStatefulWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    this.enableMessaging = true,
+  });
+
+  final bool enableMessaging;
 
   @override
   ConsumerState<MyApp> createState() => _MyAppState();
@@ -42,7 +48,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     super.initState();
 
     router = GoRouter(
-      initialLocation: '/login',
+      initialLocation: AppRoutes.login,
       redirect: (context, state) {
         final authState = ref.read(authStateProvider);
 
@@ -51,10 +57,10 @@ class _MyAppState extends ConsumerState<MyApp> {
         }
 
         final loggedIn = authState.asData?.value ?? false;
-        final goingLogin = state.matchedLocation == '/login';
+        final goingLogin = state.matchedLocation == AppRoutes.login;
 
         if (!loggedIn) {
-          return goingLogin ? null : '/login';
+          return goingLogin ? null : AppRoutes.login;
         }
 
         // Setelah login siap, buka tujuan notifikasi yang disimpan.
@@ -71,26 +77,26 @@ class _MyAppState extends ConsumerState<MyApp> {
         }
 
         if (goingLogin) {
-          return '/';
+          return AppRoutes.home;
         }
 
         return null;
       },
       routes: [
         GoRoute(
-          path: '/login',
+          path: AppRoutes.login,
           builder: (context, state) => const LoginPage(),
         ),
         GoRoute(
-          path: '/',
+          path: AppRoutes.home,
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          path: '/debug',
+          path: AppRoutes.debug,
           builder: (context, state) => const DebugPage(),
         ),
         GoRoute(
-          path: '/pengumuman/:id',
+          path: AppRoutes.announcementPattern,
           builder: (context, state) {
             return AnnouncementPage(
               id: state.pathParameters['id'] ?? '',
@@ -100,12 +106,14 @@ class _MyAppState extends ConsumerState<MyApp> {
       ],
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+    if (widget.enableMessaging) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
 
-      unawaited(_initMessaging());
-    });
-  }
+        unawaited(_initMessaging());
+      });
+    }
+  } // Menutup fungsi initState()
 
   Future<void> _initMessaging() async {
     try {

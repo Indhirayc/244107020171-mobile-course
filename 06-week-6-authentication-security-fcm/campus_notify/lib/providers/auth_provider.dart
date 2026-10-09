@@ -17,7 +17,13 @@ final apiClientProvider = Provider<Dio>((ref) {
   final store = ref.watch(tokenStoreProvider);
   final auth = ref.watch(authRepositoryProvider);
 
-  return buildApiClient(store, auth);
+  return buildApiClient(
+    store,
+    auth,
+    onSessionExpired: () {
+      ref.read(authStateProvider.notifier).sessionExpired();
+    },
+  );
 });
 
 final authStateProvider = AsyncNotifierProvider<AuthNotifier, bool>(
@@ -29,7 +35,7 @@ class AuthNotifier extends AsyncNotifier<bool> {
   Future<bool> build() async {
     final token = await ref.watch(tokenStoreProvider).readAccess();
 
-    return token != null;
+    return token?.isNotEmpty ?? false;
   }
 
   Future<void> login(String email, String password) async {
@@ -50,6 +56,10 @@ class AuthNotifier extends AsyncNotifier<bool> {
 
   Future<void> logout() async {
     await ref.read(tokenStoreProvider).clear();
+    state = const AsyncData(false);
+  }
+
+  void sessionExpired() {
     state = const AsyncData(false);
   }
 }
