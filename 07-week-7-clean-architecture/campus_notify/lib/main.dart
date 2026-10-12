@@ -9,8 +9,8 @@ import 'messaging/push_service.dart';
 import 'pages/announcement_page.dart';
 import 'pages/debug_page.dart';
 import 'pages/home_page.dart';
-import 'pages/login_page.dart';
-import 'providers/auth_provider.dart';
+import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/providers/auth_provider.dart';
 import 'routes.dart';
 import 'features/notes/presentation/pages/notes_page.dart';
 

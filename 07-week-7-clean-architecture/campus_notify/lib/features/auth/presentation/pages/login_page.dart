@@ -1,8 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 
-import '../data/api_errors.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -24,19 +23,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
-    await ref
-        .read(authStateProvider.notifier)
-        .login(_emailController.text.trim(), _passwordController.text);
+    await ref.read(authStateProvider.notifier).login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
 
     if (!mounted) return;
 
     final authState = ref.read(authStateProvider);
 
     if (authState.hasError) {
-      final error = authState.error!;
-      final message = error is DioException
-          ? apiErrorMessage(error)
-          : error.toString();
+      final error = authState.error;
+
+      final message = error is AuthFailureException
+          ? error.message
+          : 'Terjadi kesalahan, silakan coba lagi';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login gagal: $message')),
       );

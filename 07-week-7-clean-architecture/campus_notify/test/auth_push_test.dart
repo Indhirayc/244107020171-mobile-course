@@ -1,10 +1,13 @@
 import 'dart:typed_data';
 
+import 'package:campus_notify/core/failures.dart';
 import 'package:campus_notify/data/api_client.dart';
 import 'package:campus_notify/data/api_errors.dart';
-import 'package:campus_notify/data/auth_repository.dart';
-import 'package:campus_notify/data/token_store.dart';
-import 'package:campus_notify/providers/auth_provider.dart';
+import 'package:campus_notify/features/auth/data/datasources/token_store.dart';
+import 'package:campus_notify/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:campus_notify/features/auth/domain/entities/auth_session.dart';
+import 'package:campus_notify/features/auth/domain/repositories/auth_repository.dart';
+import 'package:campus_notify/features/auth/presentation/providers/auth_provider.dart';
 import 'package:campus_notify/routes.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,12 +50,14 @@ void main() {
   group('Authentication session', () {
     test('access token determines authenticated state', () async {
       final store = _FakeTokenStore(access: 'access-token');
+
       final container = ProviderContainer(
         overrides: [
           tokenStoreProvider.overrideWithValue(store),
-          authRepositoryProvider.overrideWithValue(AuthRepository()),
+          authRepositoryProvider.overrideWithValue(AuthRepositoryImpl()),
         ],
       );
+
       addTearDown(container.dispose);
 
       expect(await container.read(authStateProvider.future), isTrue);
@@ -60,12 +65,14 @@ void main() {
 
     test('missing or empty access token is unauthenticated', () async {
       final store = _FakeTokenStore(access: '');
+
       final container = ProviderContainer(
         overrides: [
           tokenStoreProvider.overrideWithValue(store),
-          authRepositoryProvider.overrideWithValue(AuthRepository()),
+          authRepositoryProvider.overrideWithValue(AuthRepositoryImpl()),
         ],
       );
+
       addTearDown(container.dispose);
 
       expect(await container.read(authStateProvider.future), isFalse);
@@ -78,27 +85,31 @@ void main() {
           access: 'access-token',
           refresh: 'expired-refresh-token',
         );
+
+        final repository = _FailingRefreshRepository();
+
         final container = ProviderContainer(
           overrides: [
             tokenStoreProvider.overrideWithValue(store),
-            authRepositoryProvider.overrideWithValue(
-              _FailingRefreshRepository(),
-            ),
+            authRepositoryProvider.overrideWithValue(repository),
           ],
         );
+
         addTearDown(container.dispose);
 
         expect(await container.read(authStateProvider.future), isTrue);
 
         final adapter = _UnauthorizedAdapter();
+
         final client = buildApiClient(
           store,
-          _FailingRefreshRepository(),
+          repository,
           onSessionExpired: () {
             container.read(authStateProvider.notifier).sessionExpired();
           },
           httpClientAdapter: adapter,
         );
+
         addTearDown(() => client.close(force: true));
 
         await expectLater(
@@ -109,7 +120,9 @@ void main() {
         expect(store.access, isNull);
         expect(store.refresh, isNull);
         expect(store.clearCount, 1);
+
         expect(adapter.authorizationHeaders, ['Bearer access-token']);
+
         expect(container.read(authStateProvider).asData?.value, isFalse);
       },
     );
@@ -118,6 +131,7 @@ void main() {
   group('API error messages', () {
     test('401 asks the user to sign in again', () {
       final request = RequestOptions(path: '/private');
+
       final error = DioException(
         requestOptions: request,
         response: Response<void>(requestOptions: request, statusCode: 401),
@@ -128,21 +142,25 @@ void main() {
 
     test('timeout and connection errors have friendly messages', () {
       final request = RequestOptions(path: '/');
+
       final timeout = DioException(
         requestOptions: request,
         type: DioExceptionType.connectionTimeout,
       );
+
       final connection = DioException(
         requestOptions: request,
         type: DioExceptionType.connectionError,
       );
 
       expect(apiErrorMessage(timeout), contains('terlalu lama'));
+
       expect(apiErrorMessage(connection), contains('koneksi internet'));
     });
   });
 }
 
+// Fake TokenStore untuk pengujian tanpa secure storage asli.
 class _FakeTokenStore extends TokenStore {
   _FakeTokenStore({this.access, this.refresh});
 
@@ -170,13 +188,28 @@ class _FakeTokenStore extends TokenStore {
   }
 }
 
-class _FailingRefreshRepository extends AuthRepository {
+// Fake repository untuk mensimulasikan kegagalan refresh token.
+class _FailingRefreshRepository implements AuthRepository {
   @override
-  Future<String> refresh(String refreshToken) async {
-    throw StateError('Refresh token rejected');
+  Future<({AuthSession? session, Failure? failure})> login({
+    required String email,
+    required String password,
+  }) async {
+    return (
+      session: null,
+      failure: const LocalFailure('Login tidak tersedia dalam pengujian'),
+    );
+  }
+
+  @override
+  Future<({String? access, Failure? failure})> refresh(
+    String refreshToken,
+  ) async {
+    return (access: null, failure: const LocalFailure('Refresh token ditolak'));
   }
 }
 
+// Fake HTTP adapter untuk mensimulasikan respons HTTP 401.
 class _UnauthorizedAdapter implements HttpClientAdapter {
   final authorizationHeaders = <String?>[];
 
@@ -187,6 +220,7 @@ class _UnauthorizedAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     authorizationHeaders.add(options.headers['Authorization'] as String?);
+
     return ResponseBody.fromString(
       '{}',
       401,

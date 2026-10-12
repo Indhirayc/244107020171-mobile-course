@@ -1,7 +1,8 @@
+
 import 'package:dio/dio.dart';
 
-import 'auth_repository.dart';
-import 'token_store.dart';
+import '../features/auth/data/datasources/token_store.dart';
+import '../features/auth/domain/repositories/auth_repository.dart';
 
 const _authRetryKey = 'authRetry';
 
@@ -12,6 +13,7 @@ Dio buildApiClient(
   HttpClientAdapter? httpClientAdapter,
 }) {
   final dio = Dio(BaseOptions(baseUrl: 'https://example-campus-api.test'));
+
   if (httpClientAdapter != null) {
     dio.httpClientAdapter = httpClientAdapter;
   }
@@ -25,9 +27,11 @@ Dio buildApiClient(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
         final access = await store.readAccess();
+
         if (access != null && access.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $access';
         }
+
         handler.next(options);
       },
       onError: (error, handler) async {
@@ -36,20 +40,29 @@ Dio buildApiClient(
         }
 
         final request = error.requestOptions;
+
         if (request.extra[_authRetryKey] == true) {
           await expireSession();
           return handler.next(error);
         }
 
         final refresh = await store.readRefresh();
+
         if (refresh == null || refresh.isEmpty) {
           await expireSession();
           return handler.next(error);
         }
 
-        late final String renewed;
+        final result = await auth.refresh(refresh);
+
+        final renewed = result.access;
+
+        if (result.failure != null || renewed == null || renewed.isEmpty) {
+          await expireSession();
+          return handler.next(error);
+        }
+
         try {
-          renewed = await auth.refresh(refresh);
           await store.save(access: renewed, refresh: refresh);
         } catch (_) {
           await expireSession();
@@ -69,5 +82,6 @@ Dio buildApiClient(
       },
     ),
   );
+
   return dio;
 }
