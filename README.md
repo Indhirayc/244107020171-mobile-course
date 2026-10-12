@@ -81,7 +81,7 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   04   | Networking & REST API                          | ✅ Selesai |
 |   05   | Local Storage & Offline First                  | ✅ Selesai |
 |   06   | Authentication, Security & FCM                 | ✅ Selesai |
-|   07   | Clean Architecture                             |  ⏳ Belum  |
+|   07   | Clean Architecture                             | ✅ Selesai |
 |   08   | Mid Project Review & Code Review               |  ⏳ Belum  |
 |   09   | AI-assisted Development / Vibe Coding          |  ⏳ Belum  |
 |   10   | AI Feature Integration                         |  ⏳ Belum  |
@@ -141,6 +141,18 @@ Praktikum juga mencakup integrasi **Firebase Cloud Messaging (FCM)** untuk menge
 Selain itu, dilakukan **AI Challenge menggunakan GitHub Copilot**, refactoring struktur kode, pemisahan konstanta route dan penanganan error API, serta unit testing dan widget testing. Pengujian terakhir menunjukkan **11 test berhasil dijalankan**, termasuk smoke test yang mengisolasi inisialisasi Firebase Messaging.
 
 Integrasi backend untuk registrasi token perangkat masih menggunakan konfigurasi contoh dan belum diverifikasi dengan server produksi.
+
+**Status:** ✅ Selesai
+
+### Week 07 — Clean Architecture
+
+Mempelajari penerapan **Clean Architecture** pada Flutter menggunakan pendekatan **feature-first**, pemisahan **Presentation, Domain, dan Data Layer**, serta prinsip SOLID dan dependency rule.
+
+Praktikum mencakup audit arsitektur, implementasi repository pattern, use case, dependency injection menggunakan Riverpod, serta refactoring fitur **Notes dan Auth**.
+
+Selain itu, dilakukan **AI Challenge menggunakan ChatGPT** untuk mengevaluasi rancangan arsitektur dan menghindari over-engineering, serta unit testing menggunakan fake repository.
+
+Hasil pengujian menunjukkan **`flutter analyze` tanpa masalah** dan **16 test berhasil dijalankan**.
 
 **Status:** ✅ Selesai
 
