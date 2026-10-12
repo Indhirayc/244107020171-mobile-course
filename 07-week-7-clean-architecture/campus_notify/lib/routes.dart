@@ -4,6 +4,7 @@ class AppRoutes {
   static const login = '/login';
   static const home = '/';
   static const debug = '/debug';
+  static const notes = '/notes';
   static const announcementPrefix = '/pengumuman';
   static const announcementPattern = '$announcementPrefix/:id';
 
@@ -35,3 +36,5 @@ String routeFromPath(Object? value) {
 
   return AppRoutes.home;
 }
+
+

@@ -12,6 +12,7 @@ import 'pages/home_page.dart';
 import 'pages/login_page.dart';
 import 'providers/auth_provider.dart';
 import 'routes.dart';
+import 'features/notes/presentation/pages/notes_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -83,6 +84,10 @@ class _MyAppState extends ConsumerState<MyApp> {
         return null;
       },
       routes: [
+        GoRoute(
+          path: AppRoutes.notes,
+          builder: (context, state) => const NotesPage(),
+        ),
         GoRoute(
           path: AppRoutes.login,
           builder: (context, state) => const LoginPage(),

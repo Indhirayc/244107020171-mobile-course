@@ -49,6 +49,13 @@ class HomePage extends ConsumerWidget {
               },
               child: const Text('Debug FCM'),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                context.push(AppRoutes.notes);
+              },
+              child: const Text('Buka Catatan'),
+            ),
           ],
         ),
       ),
