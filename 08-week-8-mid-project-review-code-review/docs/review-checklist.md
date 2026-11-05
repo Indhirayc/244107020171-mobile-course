@@ -119,3 +119,80 @@ Hasil pengujian setelah perbaikan:
 - Memastikan working tree bersih.
 
 **Status akhir:** PR #1 berhasil di-merge dan perubahan sudah tersedia pada branch `develop`.
+
+---
+
+## Praktikum 3 – Static Analysis dan Mid Review
+
+### A. Static Analysis
+
+Melakukan pemeriksaan kualitas kode Flutter menggunakan tiga perintah berikut:
+
+```bash
+flutter analyze
+dart format --set-exit-if-changed lib test
+flutter test
+```
+
+Hasil pemeriksaan:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| `flutter analyze` | No issues found! |
+| `dart format --set-exit-if-changed lib test` | 33 files formatted, 0 changed pada pemeriksaan ulang |
+| `flutter test` | 20 tests passed |
+
+Pada pemeriksaan format pertama, ditemukan 23 file yang perlu diformat dari total 33 file. Setelah proses formatting, pemeriksaan ulang menunjukkan seluruh file sudah sesuai format.
+
+### B. Konfigurasi Continuous Integration (CI)
+
+Membuat workflow GitHub Actions pada file:
+
+```text
+.github/workflows/ci.yml
+```
+
+Workflow dikonfigurasi untuk berjalan ketika terdapat Pull Request dengan tahapan:
+
+1. Mengambil kode repository menggunakan `actions/checkout@v4`.
+2. Menyiapkan Flutter menggunakan `subosito/flutter-action@v2`.
+3. Menjalankan `flutter analyze`.
+4. Menjalankan `flutter test`.
+
+Workflow menggunakan working directory:
+
+```text
+07-week-7-clean-architecture/campus_notify
+```
+
+Konfigurasi CI berhasil di-commit dan di-push ke branch `develop`.
+
+Pesan commit:
+
+```text
+ci: add Flutter analyze and test workflow
+```
+
+**Catatan:** Workflow sudah dibuat dan dikirim ke GitHub, tetapi belum diverifikasi melalui Pull Request sehingga status eksekusi GitHub Actions belum dapat dinyatakan berhasil.
+
+### C. Hasil Mid Project Review
+
+Berdasarkan pemeriksaan proyek, beberapa aspek yang telah dicapai adalah:
+
+- Struktur proyek menggunakan pendekatan Feature-First dan Clean Architecture.
+- Static analysis berhasil tanpa masalah.
+- Seluruh 20 unit test berhasil dijalankan.
+- Format kode Dart sudah diperiksa dan diperbaiki.
+- Pull Request #1 berhasil di-merge melalui Squash and Merge.
+- Konfigurasi GitHub Actions sudah tersedia pada repository.
+
+Aspek dokumentasi README, screenshot praktikum, dan peta issue/PR perlu diperiksa kembali untuk memastikan seluruh kebutuhan mid-project review terpenuhi.
+
+### D. Riwayat Commit Week 08
+
+| Commit | Pesan |
+|---|---|
+| `01bf722` | `style(week-7): format Dart source and tests` |
+| `eb4f8ee` | `ci: add Flutter analyze and test workflow` |
+
+---
