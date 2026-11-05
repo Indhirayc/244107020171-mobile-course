@@ -43,7 +43,7 @@ class NoteRepositoryImpl implements NoteRepository {
       final id = await db.insert(
         'notes',
         NoteModel(
-          title: title,
+          title: title.trim(),
           body: body,
           updatedAt: now,
           dirty: true,
@@ -53,7 +53,7 @@ class NoteRepositoryImpl implements NoteRepository {
       return (
         note: Note(
           id: id,
-          title: title,
+          title: title.trim(),
           body: body,
           updatedAt: now,
           dirty: true,

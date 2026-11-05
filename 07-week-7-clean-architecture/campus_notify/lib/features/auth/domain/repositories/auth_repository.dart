@@ -7,7 +7,5 @@ abstract class AuthRepository {
     required String password,
   });
 
-  Future<({String? access, Failure? failure})> refresh(
-    String refreshToken,
-  );
+  Future<({String? access, Failure? failure})> refresh(String refreshToken);
 }

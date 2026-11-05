@@ -8,18 +8,13 @@ class DebugPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Debug FCM'),
-      ),
+      appBar: AppBar(title: const Text('Debug FCM')),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           const Text(
             'Token FCM',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           ValueListenableBuilder<String>(
@@ -27,10 +22,7 @@ class DebugPage extends StatelessWidget {
             builder: (context, value, child) {
               return Text(
                 value,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 16,
-                ),
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 16),
               );
             },
           ),
@@ -68,17 +60,13 @@ class DebugPage extends StatelessWidget {
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Berhasil berlangganan topik.'),
-                  ),
+                  const SnackBar(content: Text('Berhasil berlangganan topik.')),
                 );
               } catch (error) {
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Subscribe gagal: $error'),
-                  ),
+                  SnackBar(content: Text('Subscribe gagal: $error')),
                 );
               }
             },
@@ -101,9 +89,7 @@ class DebugPage extends StatelessWidget {
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Unsubscribe gagal: $error'),
-                  ),
+                  SnackBar(content: Text('Unsubscribe gagal: $error')),
                 );
               }
             },

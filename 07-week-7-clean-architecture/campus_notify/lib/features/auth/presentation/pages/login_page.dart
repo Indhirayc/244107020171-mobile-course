@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,10 +22,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
-    await ref.read(authStateProvider.notifier).login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    await ref
+        .read(authStateProvider.notifier)
+        .login(_emailController.text.trim(), _passwordController.text);
 
     if (!mounted) return;
 
@@ -39,9 +37,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ? error.message
           : 'Terjadi kesalahan, silakan coba lagi';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login gagal: $message')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Login gagal: $message')));
     }
   }
 

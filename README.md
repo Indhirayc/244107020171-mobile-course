@@ -82,7 +82,7 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   05   | Local Storage & Offline First                  | ✅ Selesai |
 |   06   | Authentication, Security & FCM                 | ✅ Selesai |
 |   07   | Clean Architecture                             | ✅ Selesai |
-|   08   | Mid Project Review & Code Review               |  ⏳ Belum  |
+|   08   | Mid Project Review & Code Review               | ✅ Selesai |
 |   09   | AI-assisted Development / Vibe Coding          |  ⏳ Belum  |
 |   10   | AI Feature Integration                         |  ⏳ Belum  |
 |   11   | Performance Optimization                       |  ⏳ Belum  |
@@ -155,6 +155,20 @@ Selain itu, dilakukan **AI Challenge menggunakan ChatGPT** untuk mengevaluasi ra
 Hasil pengujian menunjukkan **`flutter analyze` tanpa masalah** dan **16 test berhasil dijalankan**.
 
 **Status:** ✅ Selesai
+
+---
+
+### Week 08 — Mid Project Review & Code Review
+
+Mempelajari proses code review dan evaluasi kualitas pengembangan aplikasi Flutter melalui penerapan Conventional Commits, pengelolaan branch, Pull Request, serta prinsip review kode yang bertanggung jawab.
+
+Praktikum mencakup audit riwayat Git, pengembangan fitur validasi judul catatan, penerapan Clean Architecture melalui Use Case AddNote, self-review terhadap PR #1, serta evaluasi ukuran Pull Request. Selain itu, dilakukan konfigurasi GitHub Actions untuk mengotomatisasi pemeriksaan Dart Formatter, flutter analyze, dan flutter test.
+
+Selanjutnya, dilakukan AI Challenge menggunakan GitHub Copilot untuk mengidentifikasi potensi masalah kode, memverifikasi rekomendasi AI, serta mendokumentasikan keputusan penerimaan dan penolakan temuan. Kegiatan juga mencakup refactoring, pengujian otomatis, pengujian manual, dan dokumentasi refleksi code review.
+
+Hasil pengujian menunjukkan flutter analyze tanpa masalah, 33 file telah sesuai format Dart, dan 20 test berhasil dijalankan.
+
+Status: ✅ Selesai
 
 ---
 

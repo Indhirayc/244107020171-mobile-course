@@ -7,11 +7,7 @@ import 'package:campus_notify/main.dart';
 void main() {
   testWidgets('Campus Notify app smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MyApp(
-          enableMessaging: false,
-        ),
-      ),
+      const ProviderScope(child: MyApp(enableMessaging: false)),
     );
 
     expect(find.byType(MaterialApp), findsOneWidget);

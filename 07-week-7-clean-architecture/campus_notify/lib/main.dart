@@ -21,18 +21,11 @@ Future<void> main() async {
 
   registerBackgroundHandler();
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
-  const MyApp({
-    super.key,
-    this.enableMessaging = true,
-  });
+  const MyApp({super.key, this.enableMessaging = true});
 
   final bool enableMessaging;
 
@@ -103,9 +96,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         GoRoute(
           path: AppRoutes.announcementPattern,
           builder: (context, state) {
-            return AnnouncementPage(
-              id: state.pathParameters['id'] ?? '',
-            );
+            return AnnouncementPage(id: state.pathParameters['id'] ?? '');
           },
         ),
       ],
@@ -147,9 +138,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
       await initFcmToken(
         onToken: (token) async {
-          debugPrint(
-            'Token FCM diterima; backend belum dikonfigurasi.',
-          );
+          debugPrint('Token FCM diterima; backend belum dikonfigurasi.');
         },
       );
 
