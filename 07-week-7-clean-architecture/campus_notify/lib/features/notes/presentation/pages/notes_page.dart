@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,21 +12,15 @@ class NotesPage extends ConsumerWidget {
     final state = ref.watch(notesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Catatan'),
-      ),
+      appBar: AppBar(title: const Text('Catatan')),
       body: state.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => ErrorView(
           message: '$error',
           onRetry: () => ref.invalidate(notesProvider),
         ),
         data: (notes) => notes.isEmpty
-            ? const Center(
-                child: Text('Belum ada catatan.'),
-              )
+            ? const Center(child: Text('Belum ada catatan.'))
             : NotesList(notes: notes),
       ),
       floatingActionButton: FloatingActionButton(
@@ -37,10 +30,7 @@ class NotesPage extends ConsumerWidget {
     );
   }
 
-  Future<void> _showAddNoteDialog(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Future<void> _showAddNoteDialog(BuildContext context, WidgetRef ref) async {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
 
@@ -77,7 +67,9 @@ class NotesPage extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                final result = await ref.read(addNoteProvider).call(
+                final result = await ref
+                    .read(addNoteProvider)
+                    .call(
                       title: titleController.text,
                       body: bodyController.text,
                     );
@@ -86,9 +78,7 @@ class NotesPage extends ConsumerWidget {
 
                 if (result.failure != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result.failure!.message),
-                    ),
+                    SnackBar(content: Text(result.failure!.message)),
                   );
                   return;
                 }
@@ -115,11 +105,7 @@ class NotesPage extends ConsumerWidget {
 }
 
 class ErrorView extends StatelessWidget {
-  const ErrorView({
-    super.key,
-    required this.message,
-    required this.onRetry,
-  });
+  const ErrorView({super.key, required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -132,10 +118,7 @@ class ErrorView extends StatelessWidget {
         children: [
           Text(message),
           const SizedBox(height: 12),
-          ElevatedButton(
-            onPressed: onRetry,
-            child: const Text('Coba Lagi'),
-          ),
+          ElevatedButton(onPressed: onRetry, child: const Text('Coba Lagi')),
         ],
       ),
     );
@@ -143,10 +126,7 @@ class ErrorView extends StatelessWidget {
 }
 
 class NotesList extends StatelessWidget {
-  const NotesList({
-    super.key,
-    required this.notes,
-  });
+  const NotesList({super.key, required this.notes});
 
   final List<Note> notes;
 
@@ -157,10 +137,7 @@ class NotesList extends StatelessWidget {
       itemBuilder: (context, index) {
         final note = notes[index];
 
-        return ListTile(
-          title: Text(note.title),
-          subtitle: Text(note.body),
-        );
+        return ListTile(title: Text(note.title), subtitle: Text(note.body));
       },
     );
   }

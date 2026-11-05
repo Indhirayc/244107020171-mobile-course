@@ -1,4 +1,3 @@
-
 import '../../../../core/failures.dart';
 import '../entities/note.dart';
 import '../repositories/note_repository.dart';
@@ -19,9 +18,6 @@ class AddNote {
       ));
     }
 
-    return _repository.addNote(
-      title: title.trim(),
-      body: body,
-    );
+    return _repository.addNote(title: title.trim(), body: body);
   }
 }

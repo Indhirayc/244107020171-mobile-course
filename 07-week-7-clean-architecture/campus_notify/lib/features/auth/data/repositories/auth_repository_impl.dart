@@ -43,7 +43,9 @@ class AuthRepositoryImpl implements AuthRepository {
       if (refreshToken.isEmpty) {
         return (
           access: null,
-          failure: const LocalFailure('Sesi tidak valid, silakan login kembali'),
+          failure: const LocalFailure(
+            'Sesi tidak valid, silakan login kembali',
+          ),
         );
       }
 

@@ -47,10 +47,9 @@ class AuthNotifier extends AsyncNotifier<bool> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      final result = await ref.read(loginProvider).call(
-        email: email,
-        password: password,
-      );
+      final result = await ref
+          .read(loginProvider)
+          .call(email: email, password: password);
 
       if (result.failure != null) {
         throw AuthFailureException(result.failure!.message);
@@ -62,10 +61,9 @@ class AuthNotifier extends AsyncNotifier<bool> {
       }
 
       try {
-        await ref.read(tokenStoreProvider).save(
-          access: session.access,
-          refresh: session.refresh,
-        );
+        await ref
+            .read(tokenStoreProvider)
+            .save(access: session.access, refresh: session.refresh);
       } catch (_) {
         throw const AuthFailureException(
           'Gagal menyimpan sesi, silakan coba lagi',

@@ -1,4 +1,3 @@
-
 import 'package:campus_notify/core/failures.dart';
 import 'package:campus_notify/features/notes/domain/entities/note.dart';
 import 'package:campus_notify/features/notes/domain/repositories/note_repository.dart';
@@ -18,10 +17,7 @@ void main() {
       // Assert
       expect(result.note, isNull);
       expect(result.failure, isA<LocalFailure>());
-      expect(
-        result.failure?.message,
-        'Judul catatan tidak boleh kosong',
-      );
+      expect(result.failure?.message, 'Judul catatan tidak boleh kosong');
       expect(repository.addCount, 0);
     });
 
@@ -115,9 +111,6 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<({List<Note> notes, Failure? failure})> fetchNotes() async {
-    return (
-      notes: <Note>[],
-      failure: null,
-    );
+    return (notes: <Note>[], failure: null);
   }
 }

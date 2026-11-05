@@ -1,4 +1,3 @@
-
 import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/failures.dart';
@@ -37,7 +36,6 @@ class NoteRepositoryImpl implements NoteRepository {
     required String title,
     String body = '',
   }) async {
-
     try {
       final db = await _openDb();
       final now = DateTime.now();
@@ -63,10 +61,7 @@ class NoteRepositoryImpl implements NoteRepository {
         failure: null,
       );
     } catch (e) {
-      return (
-        note: null,
-        failure: LocalFailure('Gagal menyimpan catatan: $e'),
-      );
+      return (note: null, failure: LocalFailure('Gagal menyimpan catatan: $e'));
     }
   }
 }
