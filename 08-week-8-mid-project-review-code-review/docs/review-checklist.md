@@ -268,9 +268,180 @@ Pengujian yang telah dilakukan:
 
 Catatan: Pengujian otomatis yang tersedia belum mencakup skenario tap berulang maupun penutupan dialog saat operasi penyimpanan berlangsung.
 
-## 6. Kesimpulan
+---
 
-GitHub Copilot membantu menemukan tiga potensi masalah pada PR #1. Setelah dilakukan pemeriksaan kode dan pengujian manual, dua temuan diterima karena didukung oleh alur kode, sedangkan satu temuan ditolak karena notifikasi validasi tetap terlihat ketika dialog terbuka.
+# Refactoring, Testing, dan Error Umum
 
-Keputusan akhir tetap dilakukan oleh developer berdasarkan bukti kode dan hasil pengujian, bukan menerima seluruh rekomendasi AI secara langsung.
+### A. Refactoring Challenge
 
+#### 1. Review dan Perbaikan Pull Request
+
+PR yang digunakan sebagai objek evaluasi:
+
+- **PR:** #1
+- **Judul:** `feat(notes): validasi judul kosong + test`
+- **Base branch:** `develop`
+- **Feature branch:** `feat/notes-validation`
+- **Status:** Merged
+
+Perbaikan yang dilakukan berdasarkan proses review:
+
+1. Memindahkan validasi judul kosong ke Domain Layer melalui Use Case `AddNote`.
+2. Memperbarui `notes_providers.dart` dengan `addNoteProvider`.
+3. Memperbarui `notes_page.dart` agar menggunakan Use Case.
+4. Menambahkan unit test pada `add_note_test.dart`.
+
+Catatan: Review yang dilakukan merupakan self-review, belum peer review dengan minimal tiga komentar bermakna hingga status Approve.
+
+#### 2. Otomatisasi Pemeriksaan Kualitas Kode
+
+Menerapkan Dart Formatter dan GitHub Actions untuk mengotomatisasi pemeriksaan kualitas kode.
+
+File konfigurasi:
+
+`.github/workflows/ci.yml`
+
+```yaml
+name: ci
+
+on: [pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 07-week-7-clean-architecture/campus_notify
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: dart format --set-exit-if-changed lib test
+
+      - run: flutter analyze
+
+      - run: flutter test
+```
+
+Pemeriksaan yang diterapkan:
+
+- `dart format --set-exit-if-changed lib test`
+- `flutter analyze`
+- `flutter test`
+
+Commit terkait:
+
+| Commit | Pesan |
+|---|---|
+| `eb4f8ee` | `ci: add Flutter analyze and test workflow` |
+| `61b7ec7` | `ci: enforce Dart formatting in workflow` |
+
+Catatan: Konfigurasi sudah di-push ke `develop`, tetapi eksekusi GitHub Actions melalui Pull Request belum diverifikasi.
+
+#### 3. Evaluasi Ukuran Pull Request
+
+Melakukan pemeriksaan ukuran PR #1 menggunakan perintah:
+
+```bash
+git --no-pager show --stat --oneline f4a3fa0
+```
+
+Hasil pemeriksaan:
+
+| Keterangan | Jumlah |
+|---|---:|
+| File berubah | 6 |
+| Baris ditambahkan | 310 |
+| Baris dihapus | 6 |
+| Total perubahan | 316 |
+
+PR #1 melewati batas 300 baris yang direkomendasikan dalam Refactoring Challenge.
+
+Perubahan mencakup Data Layer, Domain Layer, Presentation Layer, unit test, dan dokumentasi.
+
+Keputusan: PR tidak dipecah karena sudah di-merge. Pada pengembangan berikutnya, perubahan akan direncanakan menjadi PR yang lebih kecil dan berurutan agar lebih mudah direview.
+
+### B. Testing dan Verifikasi
+
+Pengujian dilakukan pada direktori aplikasi:
+
+`07-week-7-clean-architecture/campus_notify`
+
+#### 1. Static Analysis
+
+Perintah:
+
+```bash
+flutter analyze
+```
+
+Hasil:
+
+```text
+No issues found!
+```
+
+#### 2. Dart Formatter
+
+Perintah:
+
+```bash
+dart format --set-exit-if-changed lib test
+```
+
+Hasil pemeriksaan ulang:
+
+```text
+Formatted 33 files (0 changed).
+```
+
+#### 3. Automated Testing
+
+Perintah:
+
+```bash
+flutter test
+```
+
+Hasil:
+
+```text
+00:04 +20: All tests passed!
+```
+
+#### 4. Manual Testing
+
+Pengujian dilakukan dengan mencoba menyimpan catatan tanpa mengisi judul.
+
+Hasil:
+- Aplikasi menolak penyimpanan catatan dengan judul kosong.
+- Notifikasi `Judul catatan tidak boleh kosong` ditampilkan.
+- Dialog tetap terbuka sehingga pengguna dapat memperbaiki input.
+
+Catatan: Pengujian manual terhadap skenario tap berulang dan penutupan dialog ketika proses penyimpanan berlangsung belum dilakukan.
+
+### C. Error Umum dan Solusi
+
+| Permasalahan | Solusi |
+|---|---|
+| `flutter run` menghasilkan error `No pubspec.yaml file found` | Masuk ke direktori `07-week-7-clean-architecture/campus_notify` sebelum menjalankan perintah Flutter. |
+| `dart format --set-exit-if-changed .` mengalami error pada folder build | Batasi pemeriksaan pada direktori `lib` dan `test`. |
+| CI belum memeriksa format kode | Tambahkan perintah `dart format --set-exit-if-changed lib test` pada workflow. |
+| PR memiliki lebih dari 300 baris perubahan | Evaluasi pemisahan perubahan menjadi beberapa PR kecil pada pengembangan berikutnya. |
+
+### D. Checklist Verifikasi Mandiri
+
+| No. | Checklist | Status |
+|---|---|---|
+| 1 | Branch dibuat dari `develop` dan PR berfokus pada satu fitur | Selesai |
+| 2 | Issue ditutup melalui PR | Belum diverifikasi |
+| 3 | Minimal 3 komentar review bermakna ditindaklanjuti hingga Approve | Belum |
+| 4 | `flutter analyze` bersih | Selesai |
+| 5 | `dart format` rapi | Selesai |
+| 6 | `flutter test` berhasil | Selesai |
+| 7 | Tabel usulan AI dan keputusan final terdokumentasi di `docs/` | Selesai |
