@@ -445,3 +445,56 @@ Catatan: Pengujian manual terhadap skenario tap berulang dan penutupan dialog ke
 | 5 | `dart format` rapi | Selesai |
 | 6 | `flutter test` berhasil | Selesai |
 | 7 | Tabel usulan AI dan keputusan final terdokumentasi di `docs/` | Selesai |
+
+---
+
+## Mini project / Industry Challenge
+1. Buat minimal 1 issue + 1 PR kecil yang di-merge via review sejawat (branch feature/* → develop).
+
+2. Sertakan template PR lengkap: masalah, solusi, cara uji, dan screenshot.
+
+3. Bukti mesin hijau: hasil flutter analyze + flutter test di README.
+
+4. Dokumentasikan prompt AI, tabel usulan-vs-keputusan-final, dan bukti penolakan/penerimaan di docs/.
+
+5. Push ke folder portfolio 08-week-8-mid-project-review/ dengan struktur docs/, README.md, dan screenshots/. README menjelaskan status paruh semester, peta issue/PR, fitur utama, stack teknologi, cara menjalankan, dan hasil yang dicapai.
+
+---
+
+## Refleksi
+
+1. Apa beda LGTM buta dengan approve yang bertanggung jawab? Apa risikonya bagi tim?
+
+Jawaban: LGTM (Looks Good To Me) buta adalah memberikan persetujuan terhadap kode tanpa memeriksa perubahan, menjalankan aplikasi, atau melakukan pengujian. Sementara itu, approve yang bertanggung jawab dilakukan setelah reviewer memahami perubahan kode, memeriksa kesesuaian arsitektur, dan memastikan fitur berjalan sesuai kebutuhan.
+
+Risiko LGTM buta bagi tim adalah bug dapat masuk ke branch utama, kualitas kode menurun, dan masalah yang seharusnya ditemukan saat review justru muncul ketika aplikasi digunakan.
+
+2. Kapan komentar wajib berstatus Request Changes, dan kapan cukup saran?
+
+Jawaban: Komentar wajib berstatus Request Changes apabila ditemukan masalah serius yang memengaruhi kebenaran fungsi, keamanan, arsitektur, atau menyebabkan fitur tidak berjalan sesuai kebutuhan.
+
+Sementara itu, komentar cukup berupa saran apabila masalahnya tidak menghambat fungsi utama, seperti alternatif penulisan kode, peningkatan keterbacaan, atau optimasi kecil yang tidak mendesak.
+
+3. Bagian mana dari review AI yang ditolak atau disederhanakan, dan mengapa?
+
+Jawaban: Pada review menggunakan GitHub Copilot terhadap PR #1, terdapat tiga temuan. Dua temuan diterima, yaitu kemungkinan penyimpanan catatan duplikat akibat tombol Simpan ditekan berulang kali dan kemungkinan daftar catatan tidak diperbarui ketika dialog ditutup saat proses penyimpanan berlangsung.
+
+Satu temuan ditolak, yaitu kemungkinan pesan validasi tertutup oleh dialog. Setelah dilakukan pengujian manual dengan memasukkan judul kosong, notifikasi "Judul catatan tidak boleh kosong" ternyata tetap terlihat. Oleh karena itu, temuan tersebut tidak terbukti sebagai masalah pada aplikasi.
+
+4. Satu hal konkret yang diperbaiki setelah review — apa dampaknya?
+
+Jawaban: Salah satu perbaikan konkret pada PR #1 adalah memindahkan validasi judul catatan kosong dari Data Layer ke Domain Layer melalui Use Case AddNote.
+
+Perubahan tersebut membuat tanggung jawab validasi berada pada lapisan yang tepat sesuai prinsip Clean Architecture. Selain itu, pengujian menjadi lebih terarah karena perilaku validasi dapat diuji langsung melalui Use Case menggunakan Fake Repository.
+
+---
+
+## Kesimpulan
+
+Berdasarkan kegiatan Week 08 – Mid Project Review & Code Review, dapat disimpulkan bahwa proses pengembangan aplikasi Flutter tidak hanya berfokus pada implementasi fitur, tetapi juga memperhatikan kualitas kode, struktur arsitektur, pengujian, dan pengelolaan kolaborasi menggunakan Git dan GitHub.
+
+Melalui kegiatan ini, saya mempelajari penerapan Conventional Commits, pengelolaan branch, serta proses Pull Request dan code review. Saya juga melakukan evaluasi terhadap penerapan Clean Architecture dengan memindahkan validasi judul catatan ke Domain Layer melalui Use Case AddNote.
+
+Selain itu, penggunaan GitHub Copilot membantu menemukan potensi masalah pada kode, tetapi setiap rekomendasi AI tetap perlu diverifikasi melalui pemeriksaan kode dan pengujian manual. Pemeriksaan menggunakan flutter analyze, Dart Formatter, dan flutter test juga membantu memastikan kualitas serta konsistensi kode.
+
+Secara keseluruhan, kegiatan ini memberikan pemahaman bahwa pengembangan aplikasi yang baik membutuhkan kode yang terstruktur, pengujian yang memadai, dokumentasi yang jelas, serta proses review yang bertanggung jawab.
