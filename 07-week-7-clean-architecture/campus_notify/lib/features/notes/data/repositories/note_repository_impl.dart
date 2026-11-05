@@ -37,13 +37,6 @@ class NoteRepositoryImpl implements NoteRepository {
     required String title,
     String body = '',
   }) async {
-    // Validasi judul kosong atau hanya berisi spasi.
-    if (title.trim().isEmpty) {
-      return (
-        note: null,
-        failure: const LocalFailure('Judul catatan tidak boleh kosong'),
-      );
-    }
 
     try {
       final db = await _openDb();
