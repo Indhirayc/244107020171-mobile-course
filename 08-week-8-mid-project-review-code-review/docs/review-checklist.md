@@ -195,6 +195,20 @@ Aspek dokumentasi README, screenshot praktikum, dan peta issue/PR perlu diperiks
 | `01bf722` | `style(week-7): format Dart source and tests` |
 | `eb4f8ee` | `ci: add Flutter analyze and test workflow` |
 
+### E. Evaluasi Ukuran Pull Request
+
+PR #1 (`feat(notes): validate note titles and add tests`) memiliki statistik perubahan:
+
+- 6 file berubah.
+- 310 baris ditambahkan.
+- 6 baris dihapus.
+- Total perubahan: 316 baris.
+
+PR tersebut melewati batas 300 baris yang direkomendasikan dalam Refactoring Challenge. Namun, perubahan masih berfokus pada satu fitur, yaitu validasi judul catatan.
+
+**Keputusan:** PR tidak dipecah karena sudah di-merge. Untuk pengembangan berikutnya, perubahan fitur, pengujian, dan dokumentasi akan direncanakan menjadi PR yang lebih kecil agar proses review lebih mudah.
+
+
 ---
 
 # AI Review vs Keputusan Developer
