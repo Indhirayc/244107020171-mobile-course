@@ -1,3 +1,4 @@
+
 import 'package:sqflite/sqflite.dart';
 
 import '../../../../core/failures.dart';
@@ -36,6 +37,14 @@ class NoteRepositoryImpl implements NoteRepository {
     required String title,
     String body = '',
   }) async {
+    // Validasi judul kosong atau hanya berisi spasi.
+    if (title.trim().isEmpty) {
+      return (
+        note: null,
+        failure: const LocalFailure('Judul catatan tidak boleh kosong'),
+      );
+    }
+
     try {
       final db = await _openDb();
       final now = DateTime.now();
@@ -43,7 +52,7 @@ class NoteRepositoryImpl implements NoteRepository {
       final id = await db.insert(
         'notes',
         NoteModel(
-          title: title,
+          title: title.trim(),
           body: body,
           updatedAt: now,
           dirty: true,
@@ -53,7 +62,7 @@ class NoteRepositoryImpl implements NoteRepository {
       return (
         note: Note(
           id: id,
-          title: title,
+          title: title.trim(),
           body: body,
           updatedAt: now,
           dirty: true,
@@ -61,7 +70,10 @@ class NoteRepositoryImpl implements NoteRepository {
         failure: null,
       );
     } catch (e) {
-      return (note: null, failure: LocalFailure('Gagal menyimpan catatan: $e'));
+      return (
+        note: null,
+        failure: LocalFailure('Gagal menyimpan catatan: $e'),
+      );
     }
   }
 }
