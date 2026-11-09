@@ -84,7 +84,7 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   07   | Clean Architecture                             | ✅ Selesai |
 |   08   | Mid Project Review & Code Review               | ✅ Selesai |
 |   09   | AI-assisted Development / Vibe Coding          | ✅ Selesai |
-|   10   | AI Feature Integration                         |  ⏳ Belum  |
+|   10   | AI Feature Integration                         | ✅ Selesai |
 |   11   | Performance Optimization                       |  ⏳ Belum  |
 |   12   | Testing & Quality Assurance                    |  ⏳ Belum  |
 |   13   | CI/CD & Automation                             |  ⏳ Belum  |
@@ -179,6 +179,20 @@ Mempelajari workflow *AI-assisted development* (`prompt`, `generate`, `verify`, 
 Praktikum mencakup penerapan Formula 5 Slot dalam prompt engineering untuk menambahkan fitur pencarian judul catatan (*Search Notes*) dan penanganan *Empty State* pada basis aplikasi Offline Notes. Selain itu, dilakukan evaluasi kritis dan deteksi halusinasi kode AI (koreksi package usang Riverpod `StateProvider` ke `NotifierProvider`, perbaikan lifecycle `ConsumerState.build`), refactoring arsitektur, serta pencatatan log lengkap pada `docs/ai-log.md`.
 
 Hasil pengujian menunjukkan `flutter analyze` bersih tanpa issue, formatting Dart rapi, dan 8 unit test berhasil dijalankan (100% passed).
+
+Status: ✅ Selesai
+
+---
+
+### Week 10 — AI Feature Integration
+
+Mempelajari integrasi model kecerdasan buatan (*Large Language Model / LLM API*) ke dalam aplikasi mobile Flutter secara aman, terstruktur, dan efisien.
+
+Praktikum mencakup perancangan antarmuka obrolan (*Chat Interface*) asisten kampus interaktif dengan *streaming/loading indicator*, implementasi *AI Service Layer* terisolasi yang mengonsumsi Google Gemini 1.5 Flash REST API, manajemen kredensial aman menggunakan `flutter_secure_storage` (Android Keystore / iOS Keychain) tanpa pernah meng-hardcode API key pada repositori, serta manajemen state percakapan menggunakan Riverpod `Notifier`.
+
+Selain itu, dilakukan perancangan prompt sistem dan batasan privasi (*guardrails*), mitigasi risiko kebocoran data sensitif dan lonjakan biaya, penanganan error kuota (`HTTP 429`) dengan dialog *fallback* yang anggun (*graceful degradation*) menuju catatan offline lokal, serta dokumentasi log interaksi lengkap pada `docs/ai-log.md`.
+
+Hasil pengujian menunjukkan `flutter analyze` bersih tanpa issue (0 warnings) dan 27 unit test berhasil dijalankan dengan predikat hijau (100% passed).
 
 Status: ✅ Selesai
 
