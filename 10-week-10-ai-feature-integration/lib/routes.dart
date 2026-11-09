@@ -7,6 +7,7 @@ class AppRoutes {
   static const home = '/';
   static const debug = '/debug';
   static const notes = '/notes';
+  static const chat = '/chat';
   static const announcementPrefix = '/pengumuman';
   static const announcementPattern = '$announcementPrefix/:id';
 

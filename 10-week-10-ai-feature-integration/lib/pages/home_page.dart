@@ -53,6 +53,14 @@ class HomePage extends ConsumerWidget {
               },
               child: const Text('Buka Catatan'),
             ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              icon: const Icon(Icons.smart_toy_outlined),
+              onPressed: () {
+                context.push(AppRoutes.chat);
+              },
+              label: const Text('Tanya Asisten AI Kampus'),
+            ),
           ],
         ),
       ),
