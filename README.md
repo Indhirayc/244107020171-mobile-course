@@ -83,7 +83,7 @@ Teknologi dan tools yang digunakan dalam pembelajaran:
 |   06   | Authentication, Security & FCM                 | ✅ Selesai |
 |   07   | Clean Architecture                             | ✅ Selesai |
 |   08   | Mid Project Review & Code Review               | ✅ Selesai |
-|   09   | AI-assisted Development / Vibe Coding          |  ⏳ Belum  |
+|   09   | AI-assisted Development / Vibe Coding          | ✅ Selesai |
 |   10   | AI Feature Integration                         |  ⏳ Belum  |
 |   11   | Performance Optimization                       |  ⏳ Belum  |
 |   12   | Testing & Quality Assurance                    |  ⏳ Belum  |
@@ -167,6 +167,18 @@ Praktikum mencakup audit riwayat Git, pengembangan fitur validasi judul catatan,
 Selanjutnya, dilakukan AI Challenge menggunakan GitHub Copilot untuk mengidentifikasi potensi masalah kode, memverifikasi rekomendasi AI, serta mendokumentasikan keputusan penerimaan dan penolakan temuan. Kegiatan juga mencakup refactoring, pengujian otomatis, pengujian manual, dan dokumentasi refleksi code review.
 
 Hasil pengujian menunjukkan flutter analyze tanpa masalah, 33 file telah sesuai format Dart, dan 20 test berhasil dijalankan.
+
+Status: ✅ Selesai
+
+---
+
+### Week 09 — AI-assisted Development / Vibe Coding
+
+Mempelajari workflow *AI-assisted development* (`prompt`, `generate`, `verify`, `test`, `refactor`, `explain`) untuk meningkatkan produktivitas pengembangan aplikasi Flutter secara bertanggung jawab dan terukur.
+
+Praktikum mencakup penerapan Formula 5 Slot dalam prompt engineering untuk menambahkan fitur pencarian judul catatan (*Search Notes*) dan penanganan *Empty State* pada basis aplikasi Offline Notes. Selain itu, dilakukan evaluasi kritis dan deteksi halusinasi kode AI (koreksi package usang Riverpod `StateProvider` ke `NotifierProvider`, perbaikan lifecycle `ConsumerState.build`), refactoring arsitektur, serta pencatatan log lengkap pada `docs/ai-log.md`.
+
+Hasil pengujian menunjukkan `flutter analyze` bersih tanpa issue, formatting Dart rapi, dan 8 unit test berhasil dijalankan (100% passed).
 
 Status: ✅ Selesai
 
