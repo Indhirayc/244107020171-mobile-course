@@ -113,22 +113,27 @@ State obrolan dikelola menggunakan Riverpod `Notifier`:
 
 Berikut adalah dokumentasi hasil implementasi antarmuka dan pengujian fitur:
 
-### 1. Tampilan Awal Chat & Konfigurasi API Key
-Tampilan layar Asisten AI saat pertama kali dibuka, menampilkan banner peringatan konfigurasi kunci API beserta dialog input aman terenkripsi:
+### 1. Tampilan Awal Chat & Banner Peringatan API Key
+Tampilan layar Asisten AI saat pertama kali dibuka, menampilkan banner peringatan konfigurasi kunci API sebelum kunci diatur:
 
-![Chat Welcome & API Key Dialog](screenshots/p1_chatWelcomeApiKey.png)
+![Chat Welcome & API Key Banner](screenshots/p1_chatWelcomeApiKey.png)
 
-### 2. Tampilan Percakapan Interaktif dengan AI
-Percakapan aktif antara pengguna dan Asisten AI Kampus yang memberikan respon ringkas dan solutif seputar perkuliahan:
+### 2. Notifikasi Konfirmasi Penyimpanan API Key Aman
+Tampilan layar saat pengguna berhasil memasukkan dan menyimpan Gemini API Key ke dalam enkripsi lokal perangkat (`FlutterSecureStorage`), ditandai dengan notifikasi snackbar *"API Key berhasil disimpan dengan aman!"*:
+
+![API Key Saved Notification](screenshots/p1_apiKeySavedSnackbar.png)
+
+### 3. Tampilan Percakapan Interaktif dengan AI
+Percakapan aktif antara pengguna dan Asisten AI Kampus yang memberikan respon ringkas dan solutif seputar manajemen waktu perkuliahan:
 
 ![Chat Conversation](screenshots/p1_chatConversation.png)
 
-### 3. Tampilan Penanganan Error & Fallback Layanan AI
-Dialog fallback yang muncul saat layanan AI sedang mengalami lonjakan trafik atau kehilangan koneksi, mengarahkan pengguna kembali ke catatan offline:
+### 4. Tampilan Penanganan Error & Dialog Fallback Layanan AI
+Dialog fallback *"Layanan AI Sibuk"* yang muncul saat terjadi error koneksi atau limit API, mengarahkan pengguna secara anggun ke opsi catatan offline lokal:
 
 ![Fallback Busy Dialog](screenshots/p1_fallbackBusyDialog.png)
 
-### 4. Bukti Pengujian Otomatis Mesin Hijau
+### 5. Bukti Pengujian Otomatis Mesin Hijau
 Tangkapan layar terminal yang membuktikan seluruh test suite (`flutter test` 27 passed) dan analisa kode (`flutter analyze`) lolos dengan predikat hijau:
 
 ![Flutter Test & Analyze Green](screenshots/p1_greenTests.png)
