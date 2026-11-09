@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../ai/ai_providers.dart';
 import 'api_key_dialog.dart';
 
@@ -192,15 +193,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
             CircleAvatar(
               radius: 14,
-              backgroundColor:
-                  message.isError ? Colors.red.shade100 : Colors.indigo.shade100,
+              backgroundColor: message.isError
+                  ? Colors.red.shade100
+                  : Colors.indigo.shade100,
               child: Icon(
                 message.isError ? Icons.warning : Icons.auto_awesome,
                 size: 16,
@@ -216,8 +219,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 color: isUser
                     ? Theme.of(context).colorScheme.primary
                     : (message.isError
-                        ? Colors.red.shade50
-                        : Theme.of(context).colorScheme.surfaceContainerHighest),
+                          ? Colors.red.shade50
+                          : Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -230,7 +235,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 style: TextStyle(
                   color: isUser
                       ? Colors.white
-                      : (message.isError ? Colors.red.shade900 : Colors.black87),
+                      : (message.isError
+                            ? Colors.red.shade900
+                            : Colors.black87),
                   fontSize: 14,
                 ),
               ),
@@ -270,8 +277,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     borderSide: BorderSide.none,
                   ),
                   filled: true,
-                  fillColor:
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  fillColor: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,

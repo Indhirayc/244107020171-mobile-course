@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'ai_service.dart';
 
 class ChatMessage {
@@ -150,8 +151,7 @@ class ChatNotifier extends Notifier<ChatState> {
       messages: [
         ChatMessage(
           id: 'welcome',
-          text:
-              'Riwayat telah dibersihkan. Ada yang bisa saya bantu seputar kampus?',
+          text: 'Riwayat telah dibersihkan. Ada yang bisa saya bantu seputar kampus?',
           isUser: false,
           timestamp: DateTime.now(),
         ),

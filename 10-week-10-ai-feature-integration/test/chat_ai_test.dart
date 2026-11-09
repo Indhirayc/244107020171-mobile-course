@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,7 +10,7 @@ import 'package:campus_notify/ai/ai_providers.dart';
 
 class FakeStorage extends FlutterSecureStorage {
   FakeStorage({Map<String, String>? initialData})
-      : _data = initialData != null ? Map.from(initialData) : {};
+    : _data = initialData != null ? Map.from(initialData) : {};
 
   final Map<String, String> _data;
 
@@ -76,21 +77,24 @@ void main() {
       );
     });
 
-    test('melempar Exception jika pertanyaan kosong atau hanya spasi', () async {
-      final storage = FakeStorage(initialData: {'ai_api_key': 'test-key'});
-      final service = AiService(storage: storage);
+    test(
+      'melempar Exception jika pertanyaan kosong atau hanya spasi',
+      () async {
+        final storage = FakeStorage(initialData: {'ai_api_key': 'test-key'});
+        final service = AiService(storage: storage);
 
-      expect(
-        () => service.ask('   '),
-        throwsA(
-          isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('Pertanyaan tidak boleh kosong'),
+        expect(
+          () => service.ask('   '),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Pertanyaan tidak boleh kosong'),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('mengembalikan respon teks yang benar saat HTTP 200', () async {
       final storage = FakeStorage(initialData: {'ai_api_key': 'dummy-key'});
@@ -102,17 +106,18 @@ void main() {
               'content': {
                 'parts': [
                   {
-                    'text':
-                        'Jadwal kuliah hari Senin adalah Pemrograman Mobile di Lab 2.'
-                  }
-                ]
-              }
-            }
-          ]
+                    'text': 'Jadwal kuliah hari Senin adalah Pemrograman Mobile di Lab 2.',
+                  },
+                ],
+              },
+            },
+          ],
         };
-        return http.Response(jsonEncode(mockResponse), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+          jsonEncode(mockResponse),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
       });
 
       final service = AiService(storage: storage, client: mockClient);
@@ -171,11 +176,11 @@ void main() {
               {
                 'content': {
                   'parts': [
-                    {'text': 'Ini jawaban simulasi asisten AI.'}
-                  ]
-                }
-              }
-            ]
+                    {'text': 'Ini jawaban simulasi asisten AI.'},
+                  ],
+                },
+              },
+            ],
           }),
           200,
         );
@@ -206,9 +211,7 @@ void main() {
       final storage = FakeStorage();
       final container = ProviderContainer(
         overrides: [
-          aiServiceProvider.overrideWithValue(
-            AiService(storage: storage),
-          ),
+          aiServiceProvider.overrideWithValue(AiService(storage: storage)),
         ],
       );
       addTearDown(container.dispose);

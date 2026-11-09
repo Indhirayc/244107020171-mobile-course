@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../ai/ai_providers.dart';
 
 class ApiKeyDialog extends ConsumerStatefulWidget {
@@ -116,7 +117,9 @@ class _ApiKeyDialogState extends ConsumerState<ApiKeyDialog> {
                   final key = _keyController.text.trim();
                   if (key.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('API Key tidak boleh kosong.')),
+                      const SnackBar(
+                        content: Text('API Key tidak boleh kosong.'),
+                      ),
                     );
                     return;
                   }

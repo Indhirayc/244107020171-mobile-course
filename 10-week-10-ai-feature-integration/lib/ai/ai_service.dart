@@ -1,13 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AiService {
-  AiService({
-    FlutterSecureStorage? storage,
-    http.Client? client,
-  })  : _storage = storage ?? const FlutterSecureStorage(),
-        _client = client ?? http.Client();
+  AiService({FlutterSecureStorage? storage, http.Client? client})
+    : _storage = storage ?? const FlutterSecureStorage(),
+      _client = client ?? http.Client();
 
   final FlutterSecureStorage _storage;
   final http.Client _client;
@@ -33,10 +32,7 @@ class AiService {
     await _storage.delete(key: _storageKey);
   }
 
-  Future<String> ask(
-    String question, {
-    String? systemPrompt,
-  }) async {
+  Future<String> ask(String question, {String? systemPrompt}) async {
     final trimmedQuestion = question.trim();
     if (trimmedQuestion.isEmpty) {
       throw Exception('Pertanyaan tidak boleh kosong.');
@@ -54,21 +50,18 @@ class AiService {
     final requestBody = jsonEncode({
       'system_instruction': {
         'parts': [
-          {'text': prompt}
-        ]
+          {'text': prompt},
+        ],
       },
       'contents': [
         {
           'role': 'user',
           'parts': [
-            {'text': trimmedQuestion}
-          ]
-        }
+            {'text': trimmedQuestion},
+          ],
+        },
       ],
-      'generationConfig': {
-        'temperature': 0.7,
-        'maxOutputTokens': 250,
-      }
+      'generationConfig': {'temperature': 0.7, 'maxOutputTokens': 250},
     });
 
     try {
