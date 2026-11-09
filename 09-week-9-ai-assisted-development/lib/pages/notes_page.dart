@@ -7,23 +7,58 @@ import '../data/sync.dart';
 import '../providers/offline_provider.dart';
 import 'posts_page.dart';
 import '../widgets/note_tile.dart';
+
 import 'package:go_router/go_router.dart';
 
 final noteRepositoryProvider = Provider<NoteRepository>(
   (ref) => NoteRepository(),
 );
 
-final notesProvider = FutureProvider<List<Note>>(
-  (ref) => ref.watch(noteRepositoryProvider).fetchNotes(),
+class SearchQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void setQuery(String query) {
+    state = query;
+  }
+
+  void clear() {
+    state = '';
+  }
+}
+
+final searchQueryProvider = NotifierProvider<SearchQueryNotifier, String>(
+  SearchQueryNotifier.new,
 );
 
-class NotesPage extends ConsumerWidget {
+final notesProvider = FutureProvider<List<Note>>((ref) {
+  final query = ref.watch(searchQueryProvider);
+  return ref.watch(noteRepositoryProvider).searchNotes(query);
+});
+
+class NotesPage extends ConsumerStatefulWidget {
   const NotesPage({super.key});
 
-  Future<void> _addNote(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  @override
+  ConsumerState<NotesPage> createState() => _NotesPageState();
+}
+
+class _NotesPageState extends ConsumerState<NotesPage> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _addNote(BuildContext context, WidgetRef ref) async {
     final titleController = TextEditingController();
     final bodyController = TextEditingController();
 
@@ -37,15 +72,11 @@ class NotesPage extends ConsumerWidget {
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Judul',
-                ),
+                decoration: const InputDecoration(labelText: 'Judul'),
               ),
               TextField(
                 controller: bodyController,
-                decoration: const InputDecoration(
-                  labelText: 'Isi',
-                ),
+                decoration: const InputDecoration(labelText: 'Isi'),
               ),
             ],
           ),
@@ -65,10 +96,7 @@ class NotesPage extends ConsumerWidget {
                   return;
                 }
 
-                Navigator.of(dialogContext).pop({
-                  'title': title,
-                  'body': body,
-                });
+                Navigator.of(dialogContext).pop({'title': title, 'body': body});
               },
               child: const Text('Simpan'),
             ),
@@ -92,7 +120,7 @@ class NotesPage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(notesProvider);
     final forceOffline = ref.watch(forceOfflineProvider);
 
@@ -105,17 +133,12 @@ class NotesPage extends ConsumerWidget {
                 ? 'Sync tidak tersedia saat offline'
                 : 'Sync Notes',
             icon: const Icon(Icons.sync),
-
             onPressed: forceOffline
                 ? null
                 : () async {
-                    final repository = ref.read(
-                      noteRepositoryProvider,
-                    );
+                    final repository = ref.read(noteRepositoryProvider);
 
-                    final syncedCount = await syncNotes(
-                      repository,
-                    );
+                    final syncedCount = await syncNotes(repository);
 
                     ref.invalidate(notesProvider);
 
@@ -125,57 +148,70 @@ class NotesPage extends ConsumerWidget {
                           content: Text(
                             syncedCount == 0
                                 ? 'Tidak ada catatan yang perlu '
-                                    'disinkronkan.'
+                                      'disinkronkan.'
                                 : '$syncedCount catatan berhasil '
-                                    'disinkronkan.',
+                                      'disinkronkan.',
                           ),
                         ),
                       );
                     }
                   },
           ),
-
           IconButton(
             tooltip: 'Lihat Posts',
             icon: const Icon(Icons.article_outlined),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const PostsPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const PostsPage()),
               );
             },
           ),
         ],
       ),
-
       body: Column(
         children: [
           SwitchListTile(
             title: const Text('Force Offline'),
             subtitle: Text(
-              forceOffline
-                  ? 'Simulasi offline aktif'
-                  : 'Simulasi online aktif',
+              forceOffline ? 'Simulasi offline aktif' : 'Simulasi online aktif',
             ),
             value: forceOffline,
             onChanged: (value) {
-              ref
-                  .read(forceOfflineProvider.notifier)
-                  .setOffline(value);
+              ref.read(forceOfflineProvider.notifier).setOffline(value);
             },
           ),
-
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Cari judul catatan...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: ref.watch(searchQueryProvider).isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          ref.read(searchQueryProvider.notifier).clear();
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).setQuery(value);
+              },
+            ),
+          ),
           Expanded(
             child: state.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
-
+              loading: () => const Center(child: CircularProgressIndicator()),
               data: (notes) {
-                final dirtyCount = notes
-                    .where((note) => note.dirty)
-                    .length;
+                final dirtyCount = notes.where((note) => note.dirty).length;
+                final query = ref.watch(searchQueryProvider).trim();
 
                 return Column(
                   children: [
@@ -185,24 +221,34 @@ class NotesPage extends ConsumerWidget {
                         children: [
                           const Text(
                             'Dirty Notes: ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          Badge(
-                            label: Text('$dirtyCount'),
-                          ),
+                          Badge(label: Text('$dirtyCount')),
                         ],
                       ),
                     ),
-
                     const Divider(height: 1),
-
                     Expanded(
                       child: notes.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'Belum ada catatan.',
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    query.isNotEmpty
+                                        ? Icons.search_off
+                                        : Icons.note_alt_outlined,
+                                    size: 48,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    query.isNotEmpty
+                                        ? 'Catatan dengan judul "$query" tidak ditemukan.'
+                                        : 'Belum ada catatan.',
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             )
                           : ListView.builder(
@@ -221,7 +267,6 @@ class NotesPage extends ConsumerWidget {
                   ],
                 );
               },
-
               error: (e, _) => Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -241,7 +286,6 @@ class NotesPage extends ConsumerWidget {
           ),
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _addNote(context, ref);
