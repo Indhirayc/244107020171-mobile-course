@@ -13,17 +13,13 @@ class AiService {
 
   static const String _storageKey = 'ai_api_key';
 
-  static String? _cachedWorkingEndpoint;
+  static String? _workingModel;
 
-  /// Daftar kandidat endpoint model Gemini yang dicoba secara berurutan.
-  /// Menjamin kompatibilitas mundur dan maju terhadap pembaruan versi model Google.
-  static const List<String> _candidateEndpoints = [
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent',
-    'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent',
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+  /// Daftar model Gemini yang didukung untuk free-tier generateContent
+  static const List<String> _models = [
+    'gemini-1.5-flash',
+    'gemini-pro',
+    'gemini-2.0-flash',
   ];
 
   static const String defaultSystemPrompt =
@@ -37,48 +33,12 @@ class AiService {
 
   Future<void> saveApiKey(String key) async {
     await _storage.write(key: _storageKey, value: key.trim());
-    _cachedWorkingEndpoint = null; // Reset cache endpoint saat key berganti
+    _workingModel = null;
   }
 
   Future<void> clearApiKey() async {
     await _storage.delete(key: _storageKey);
-    _cachedWorkingEndpoint = null;
-  }
-
-  /// Menemukan model aktif secara dinamis dari akun Google AI Studio pengguna
-  Future<String?> _discoverActiveModelEndpoint(String apiKey) async {
-    try {
-      final listUri = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models?key=$apiKey',
-      );
-      final res = await _client.get(
-        listUri,
-        headers: {'Content-Type': 'application/json', 'x-goog-api-key': apiKey},
-      );
-
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body) as Map<String, dynamic>;
-        final models = data['models'] as List<dynamic>?;
-        if (models != null && models.isNotEmpty) {
-          final candidates = models.where((m) {
-            final methods = m['supportedGenerationMethods'] as List<dynamic>?;
-            return methods != null && methods.contains('generateContent');
-          }).toList();
-
-          if (candidates.isNotEmpty) {
-            final flashModel = candidates.firstWhere(
-              (m) => (m['name'] as String? ?? '').contains('flash'),
-              orElse: () => candidates.first,
-            );
-            final name = flashModel['name'] as String;
-            return 'https://generativelanguage.googleapis.com/v1beta/$name:generateContent';
-          }
-        }
-      }
-    } catch (_) {
-      // Abaikan jika discovery gagal, lanjut ke candidate list
-    }
-    return null;
+    _workingModel = null;
   }
 
   Future<String> ask(String question, {String? systemPrompt}) async {
@@ -96,8 +56,7 @@ class AiService {
     }
 
     final prompt = systemPrompt ?? defaultSystemPrompt;
-    final combinedPrompt =
-        'Instruksi Sistem: $prompt\n\nPertanyaan Mahasiswa: $trimmedQuestion';
+    final combinedPrompt = '$prompt\n\nPertanyaan: $trimmedQuestion';
 
     final requestBody = jsonEncode({
       'contents': [
@@ -107,37 +66,31 @@ class AiService {
           ],
         },
       ],
-      'generationConfig': {'temperature': 0.7, 'maxOutputTokens': 250},
     });
 
-    final endpointsToTry = <String>[];
-    if (_cachedWorkingEndpoint != null) {
-      endpointsToTry.add(_cachedWorkingEndpoint!);
-    } else {
-      final discovered = await _discoverActiveModelEndpoint(apiKey);
-      if (discovered != null) {
-        endpointsToTry.add(discovered);
-      }
-    }
-    for (final ep in _candidateEndpoints) {
-      if (!endpointsToTry.contains(ep)) {
-        endpointsToTry.add(ep);
-      }
-    }
+    final modelsToTry = [
+      ?_workingModel,
+      ..._models.where((m) => m != _workingModel),
+    ];
+
+    http.Response? lastResponse;
 
     try {
-      for (final endpoint in endpointsToTry) {
+      for (final model in modelsToTry) {
+        final uri = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
+        );
+
         final response = await _client.post(
-          Uri.parse('$endpoint?key=$apiKey'),
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
-          },
+          uri,
+          headers: {'Content-Type': 'application/json'},
           body: requestBody,
         );
 
+        lastResponse = response;
+
         if (response.statusCode == 200) {
-          _cachedWorkingEndpoint = endpoint;
+          _workingModel = model;
           final data = jsonDecode(response.body) as Map<String, dynamic>;
           final candidates = data['candidates'] as List<dynamic>?;
           if (candidates != null && candidates.isNotEmpty) {
@@ -151,47 +104,36 @@ class AiService {
             }
           }
           return 'Maaf, asisten tidak dapat memberikan jawaban untuk pertanyaan tersebut.';
-        } else if (response.statusCode == 404 || response.statusCode == 400) {
-          // Model tidak ditemukan atau konfigurasi parameter berbeda, lanjut coba endpoint berikutnya
-          continue;
-        } else if (response.statusCode == 403) {
-          throw Exception(
-            'API key tidak valid atau akses ditolak (HTTP 403). Periksa kembali Gemini API key Anda.',
-          );
         } else if (response.statusCode == 429) {
           throw Exception(
             'Batas kuota request tercapai (HTTP 429). Mohon tunggu beberapa saat sebelum mencoba lagi.',
           );
-        } else {
+        } else if (response.statusCode == 403) {
+          throw Exception(
+            'API key tidak valid atau akses ditolak (HTTP 403). Periksa kembali Gemini API key Anda.',
+          );
+        } else if (response.statusCode == 404 || response.statusCode == 400) {
+          // Model ini belum aktif atau berbeda versi, coba model berikutnya
           continue;
+        } else {
+          throw Exception(
+            'Gagal memanggil AI API: HTTP ${response.statusCode}. Silakan coba lagi nanti.',
+          );
         }
       }
 
-      // Jika seluruh endpoint cloud belum siap / 404, aktifkan intelligent campus fallback
-      return _generateCampusFallbackResponse(trimmedQuestion);
-    } on http.ClientException {
-      return _generateCampusFallbackResponse(trimmedQuestion);
-    }
-  }
+      // Jika seluruh model gagal
+      if (lastResponse != null) {
+        throw Exception(
+          'Gagal memanggil AI API: HTTP ${lastResponse.statusCode}. Silakan coba lagi nanti.',
+        );
+      }
 
-  /// Jawaban Fallback Cerdas Kampus jika API Cloud sedang mengalami kendala / 404
-  String _generateCampusFallbackResponse(String question) {
-    final lower = question.toLowerCase();
-    if (lower.contains('waktu') ||
-        lower.contains('tugas') ||
-        lower.contains('terlambat') ||
-        lower.contains('tips')) {
-      return 'Untuk mengatur waktu kuliah dan tugas, prioritaskan tugas dengan tenggat waktu terdekat dan cicil tugas besar menjadi bagian kecil setiap hari. Catat setiap deadline di Campus Notify agar selalu terpantau!';
-    } else if (lower.contains('catat') ||
-        lower.contains('tambah') ||
-        lower.contains('pengumuman')) {
-      return 'Anda dapat menambahkan catatan atau pengumuman dengan menekan tombol "+" pada menu Catatan. Data akan langsung tersimpan secara aman di penyimpanan lokal Anda.';
-    } else if (lower.contains('jadwal') ||
-        lower.contains('krs') ||
-        lower.contains('kuliah')) {
-      return 'Jadwal perkuliahan dan pengisian KRS dapat dilihat melalui portal akademik kampus atau dicatat pada pengingat aplikasi Campus Notify.';
-    } else {
-      return 'Halo! Saya Asisten AI Kampus. Tetap fokus pada kegiatan akademik Anda dan manfaatkan fitur catatan lokal aplikasi untuk mendokumentasikan perkuliahan Anda secara teratur!';
+      throw Exception(
+        'Layanan AI tidak dapat dihubungi. Silakan coba lagi nanti.',
+      );
+    } on http.ClientException catch (e) {
+      throw Exception('Koneksi internet bermasalah: ${e.message}');
     }
   }
 }
